@@ -36,9 +36,16 @@ Each numbered shortcut slot has:
 - Name shown in extension logs and options.
 - URL opened when the tab does not already exist.
 - Automatic host/path matching derived from the URL.
-- A pinned index matching the shortcut number.
+- Launch mode: pinned tab or floating window.
+- Optional floating-window size and position.
+
+Blank URLs are treated as disabled slots. Disabled slots do nothing when their command is pressed.
+
+Pinned tab ordering is compressed across enabled pinned-tab slots only. For example, if slot 3 is configured as a floating window, then slot 4 becomes the third managed pinned tab rather than leaving an empty gap in the pinned tab strip.
 
 Chrome does not let extensions change command names dynamically in `chrome://extensions/shortcuts`, so that page shows generic names such as `Focus Shortcut 1`. The extension options page is the source of truth for your real slot names, such as `Gmail`, `Linear`, `Notion`, or `Banking`.
+
+Use `Export` and `Import` on the options page to back up or move your settings. Use each slot's reset button to restore one slot, or `Reset Defaults` to restore the full configuration.
 
 For deeper changes, edit `src/config.js`. Each service rule supports:
 
@@ -57,13 +64,14 @@ For deeper changes, edit `src/config.js`. Each service rule supports:
 - `tabs`: required to search, activate, pin, and move tabs.
 - `windows`: required to focus Chrome windows and create the popup panel.
 - `storage`: required for the options page and future custom settings.
-- Host permissions: limited to the built-in services that need URL matching.
 
 The extension does not send data anywhere.
 
-## ChatGPT Floating Window Strategy
+See `PRIVACY.md` and `STORE_LISTING.md` for Web Store-ready privacy and permissions copy.
 
-The extension uses `chrome.windows.create({ type: "popup" })` for `Ctrl+Alt+Shift+0`. This is the best built-in MV3 option for an app-like floating panel. It creates a popup-style Chrome window, reuses an existing ChatGPT popup if found, focuses it, and applies configured size/position.
+## Floating Window Strategy
+
+The extension uses `chrome.windows.create({ type: "popup" })` for floating-window shortcuts. This is the best built-in MV3 option for an app-like floating panel. It creates a popup-style Chrome window, reuses an existing matching popup if found, focuses it, and applies configured size/position.
 
 Chrome extension limitations:
 
@@ -115,5 +123,4 @@ Logs include command received, tab found or missing, tab created, tab moved, and
 - Cycling through multiple matching tabs.
 - Tab group creation and color assignment.
 - Startup restore that creates missing pinned tabs automatically.
-- Import/export JSON settings.
 - Command palette opened from the extension action.

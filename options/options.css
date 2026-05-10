@@ -52,6 +52,15 @@ input {
   color: CanvasText;
 }
 
+select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, CanvasText 24%, transparent);
+  border-radius: 6px;
+  background: Canvas;
+  color: CanvasText;
+}
+
 input[type="checkbox"] {
   width: 20px;
   height: 20px;
@@ -69,6 +78,7 @@ button {
 
 footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
 }
@@ -91,7 +101,7 @@ footer {
 
 .slot {
   display: grid;
-  grid-template-columns: 72px minmax(140px, 1fr) minmax(220px, 2fr);
+  grid-template-columns: 88px minmax(140px, 1fr) minmax(220px, 2fr) 132px 80px;
   gap: 12px;
   align-items: end;
   padding: 12px 0;
@@ -103,6 +113,25 @@ footer {
   padding-bottom: 9px;
 }
 
+.slot-enabled {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.slot-window {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(90px, 1fr));
+  gap: 12px;
+}
+
+.slot-window[hidden] {
+  display: none;
+}
+
 #status {
   min-height: 20px;
   opacity: 0.78;
@@ -110,6 +139,7 @@ footer {
 
 @media (max-width: 640px) {
   .slot,
+  .slot-window,
   .grid {
     grid-template-columns: 1fr;
   }

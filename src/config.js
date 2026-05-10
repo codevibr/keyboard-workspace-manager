@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
     slot1: {
       id: "slot1",
       slot: 1,
+      enabled: true,
       name: "Gmail",
       url: "https://mail.google.com",
       match: {
@@ -15,11 +16,14 @@ export const DEFAULT_SETTINGS = Object.freeze({
       },
       pinnedIndex: 0,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     slot2: {
       id: "slot2",
       slot: 2,
+      enabled: true,
       name: "Google Calendar",
       url: "https://calendar.google.com",
       match: {
@@ -28,11 +32,14 @@ export const DEFAULT_SETTINGS = Object.freeze({
       },
       pinnedIndex: 1,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     slot3: {
       id: "slot3",
       slot: 3,
+      enabled: true,
       name: "Google Messages",
       url: "https://messages.google.com/web/conversations",
       match: {
@@ -41,11 +48,14 @@ export const DEFAULT_SETTINGS = Object.freeze({
       },
       pinnedIndex: 2,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     slot4: {
       id: "slot4",
       slot: 4,
+      enabled: true,
       name: "ChatGPT",
       url: "https://chatgpt.com",
       match: {
@@ -54,76 +64,99 @@ export const DEFAULT_SETTINGS = Object.freeze({
       },
       pinnedIndex: 3,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: {
+        width: 520,
+        height: 860,
+        left: 1940,
+        top: 80
+      }
     },
     slot5: {
       id: "slot5",
       slot: 5,
+      enabled: false,
       name: "Notify",
-      url: "https://example.com/notify",
+      url: "",
       match: {
-        hosts: ["example.com"],
-        pathPrefixes: ["/notify"]
+        hosts: [],
+        pathPrefixes: ["/"]
       },
       pinnedIndex: 4,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     slot6: {
       id: "slot6",
       slot: 6,
+      enabled: false,
       name: "Shortcut 6",
-      url: "https://example.com/shortcut-6",
+      url: "",
       match: {
-        hosts: ["example.com"],
-        pathPrefixes: ["/shortcut-6"]
+        hosts: [],
+        pathPrefixes: ["/"]
       },
       pinnedIndex: 5,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     slot7: {
       id: "slot7",
       slot: 7,
+      enabled: false,
       name: "Shortcut 7",
-      url: "https://example.com/shortcut-7",
+      url: "",
       match: {
-        hosts: ["example.com"],
-        pathPrefixes: ["/shortcut-7"]
+        hosts: [],
+        pathPrefixes: ["/"]
       },
       pinnedIndex: 6,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     slot8: {
       id: "slot8",
       slot: 8,
+      enabled: false,
       name: "Shortcut 8",
-      url: "https://example.com/shortcut-8",
+      url: "",
       match: {
-        hosts: ["example.com"],
-        pathPrefixes: ["/shortcut-8"]
+        hosts: [],
+        pathPrefixes: ["/"]
       },
       pinnedIndex: 7,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     slot9: {
       id: "slot9",
       slot: 9,
+      enabled: false,
       name: "Shortcut 9",
-      url: "https://example.com/shortcut-9",
+      url: "",
       match: {
-        hosts: ["example.com"],
-        pathPrefixes: ["/shortcut-9"]
+        hosts: [],
+        pathPrefixes: ["/"]
       },
       pinnedIndex: 8,
       pinned: true,
-      windowPreference: "current"
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     },
     chatgptPanel: {
       id: "chatgptPanel",
-      name: "ChatGPT Floating Panel",
+      enabled: true,
+      name: "Floating Window",
       url: "https://chatgpt.com",
       match: {
         hosts: ["chatgpt.com", "www.chatgpt.com"],
@@ -131,6 +164,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       },
       pinnedIndex: null,
       pinned: false,
+      launchMode: "popupWindow",
       windowPreference: "popup",
       popup: {
         width: 520,

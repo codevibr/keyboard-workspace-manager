@@ -4,7 +4,7 @@ import { urlForCreate } from "./urlUtils.js";
 import { focusWindow, getCurrentWindowId, popupCreateOptions } from "./windowUtils.js";
 
 export async function focusOrCreateService(service, settings) {
-  if (service.windowPreference === "popup") {
+  if (service.launchMode === "popupWindow" || service.windowPreference === "popup") {
     return focusOrCreatePopup(service);
   }
 
@@ -14,7 +14,7 @@ export async function focusOrCreateService(service, settings) {
 
   if (selected) {
     log("Tab found", describeTab(selected.tab, service));
-    await focusExistingTab(selected.tab, service);
+    await focusExistingTab(selected.tab, service, settings);
     if (settings?.healPinnedOrderOnStartup) {
       await healPinnedServices(settings, selected.tab.windowId);
     }
@@ -22,7 +22,7 @@ export async function focusOrCreateService(service, settings) {
   }
 
   log("No matching tab found; creating", { service: service.name });
-  const created = await createPinnedTab(service, currentWindowId);
+  const created = await createPinnedTab(service, currentWindowId, settings);
   if (settings?.healPinnedOrderOnStartup) {
     await healPinnedServices(settings, created.windowId);
   }
@@ -46,17 +46,17 @@ export async function focusOrCreatePopup(service) {
   return createdWindow.tabs?.[0] || null;
 }
 
-export async function focusExistingTab(tab, service) {
+export async function focusExistingTab(tab, service, settings) {
   await focusWindow(tab.windowId);
   await chrome.tabs.update(tab.id, { active: true, pinned: Boolean(service.pinned) });
   log("Window focused and tab activated", describeTab(tab, service));
 
   if (service.pinned && Number.isInteger(service.pinnedIndex)) {
-    await moveTabToPinnedIndex(tab.id, service.pinnedIndex);
+    await moveTabToPinnedIndex(tab.id, effectivePinnedIndex(service, settings));
   }
 }
 
-export async function createPinnedTab(service, windowId) {
+export async function createPinnedTab(service, windowId, settings) {
   const createProperties = {
     url: urlForCreate(service),
     active: true,
@@ -72,7 +72,7 @@ export async function createPinnedTab(service, windowId) {
   log("Tab created", describeTab(tab, service));
 
   if (service.pinned && Number.isInteger(service.pinnedIndex)) {
-    await moveTabToPinnedIndex(tab.id, service.pinnedIndex);
+    await moveTabToPinnedIndex(tab.id, effectivePinnedIndex(service, settings));
   }
 
   return tab;
@@ -80,10 +80,10 @@ export async function createPinnedTab(service, windowId) {
 
 export async function healPinnedServices(settings, windowId) {
   const services = Object.values(settings.services)
-    .filter((service) => service.pinned && Number.isInteger(service.pinnedIndex))
+    .filter((service) => isPinnedTabService(service))
     .sort((a, b) => a.pinnedIndex - b.pinnedIndex);
 
-  for (const service of services) {
+  for (const [index, service] of services.entries()) {
     const matches = await findMatchingTabs(service);
     const match = matches.find((candidate) => candidate.tab.windowId === windowId);
     if (!match) {
@@ -91,8 +91,31 @@ export async function healPinnedServices(settings, windowId) {
     }
 
     await chrome.tabs.update(match.tab.id, { pinned: true });
-    await moveTabToPinnedIndex(match.tab.id, service.pinnedIndex);
+    await moveTabToPinnedIndex(match.tab.id, index);
   }
+}
+
+function effectivePinnedIndex(service, settings) {
+  if (!settings) {
+    return service.pinnedIndex;
+  }
+
+  const services = Object.values(settings.services)
+    .filter((candidate) => isPinnedTabService(candidate))
+    .sort((a, b) => a.pinnedIndex - b.pinnedIndex);
+
+  const index = services.findIndex((candidate) => candidate.id === service.id);
+  return index >= 0 ? index : service.pinnedIndex;
+}
+
+function isPinnedTabService(service) {
+  return Boolean(
+    service?.enabled &&
+    service.url &&
+    service.pinned &&
+    service.launchMode !== "popupWindow" &&
+    Number.isInteger(service.pinnedIndex)
+  );
 }
 
 async function moveTabToPinnedIndex(tabId, index) {

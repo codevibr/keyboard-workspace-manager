@@ -30,7 +30,22 @@
         <div id="slots" class="slots"></div>
       </section>
       <section>
-        <h2>ChatGPT Panel</h2>
+        <h2>Floating Shortcut</h2>
+        <label class="row">
+          <span>
+            <strong>Enable floating shortcut</strong>
+            <small>Assign this command manually in Chrome shortcuts if needed.</small>
+          </span>
+          <input id="panelEnabled" type="checkbox">
+        </label>
+        <label>
+          Name
+          <input id="panelName" type="text">
+        </label>
+        <label>
+          URL
+          <input id="panelUrl" type="url">
+        </label>
         <div class="grid">
           <label>Left <input id="panelLeft" type="number"></label>
           <label>Top <input id="panelTop" type="number"></label>
@@ -41,6 +56,9 @@
       <footer>
         <button id="save" type="button">Save</button>
         <button id="reset" type="button">Reset Defaults</button>
+        <button id="exportSettings" type="button">Export</button>
+        <button id="importSettings" type="button">Import</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
         <span id="status" role="status"></span>
       </footer>
     </main>

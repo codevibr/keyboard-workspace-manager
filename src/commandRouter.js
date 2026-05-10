@@ -16,5 +16,10 @@ export async function routeCommand(command, settings) {
     return;
   }
 
+  if (!service.enabled || !service.url) {
+    warn("Shortcut slot is disabled or missing a URL", { command, serviceId });
+    return;
+  }
+
   await focusOrCreateService(service, settings);
 }
