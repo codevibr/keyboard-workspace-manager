@@ -65,6 +65,8 @@ For deeper changes, edit `src/config.js`. Each service rule supports:
 - `windows`: required to focus Chrome windows and create the popup panel.
 - `storage`: required for the options page and future custom settings.
 
+The extension does not request website host permissions, inject content scripts, or read/change page contents. It reads tab URLs locally only so it can match a configured shortcut to an already-open tab.
+
 The extension does not send data anywhere.
 
 See `PRIVACY.md` and `STORE_LISTING.md` for Web Store-ready privacy and permissions copy. The public privacy policy is available at https://github.com/wsfrye/keyboard-workspace-manager/blob/main/PRIVACY.md.

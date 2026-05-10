@@ -25,7 +25,9 @@ If Chrome Sync is enabled for extensions, Chrome may sync this configuration thr
 
 ## Browser Tab Access
 
-The extension uses Chrome APIs to inspect open tab URLs and window information so it can:
+The extension does not request host permissions for Gmail, Google Calendar, Google Messages, ChatGPT, or any other configured website. It does not inject scripts into pages and does not read or change page content.
+
+The extension uses Chrome APIs to inspect open tab URLs and window information locally so it can:
 
 - Find an existing tab that matches a configured shortcut.
 - Focus the matching tab and window.

@@ -49,6 +49,8 @@ Keyboard Workspace Manager lets users configure keyboard shortcuts that focus, c
 
 Required to inspect open tab URLs, find tabs matching configured shortcut URLs, activate existing tabs, pin managed tabs, create missing tabs, and move managed pinned tabs into the correct order.
 
+The extension does not request host permissions, does not inject content scripts, and does not read or change page contents. URL inspection is used only for local tab matching.
+
 ### `windows`
 
 Required to focus the Chrome window containing a matched tab and to create or focus floating popup windows for configured shortcuts.
@@ -59,7 +61,7 @@ Required to save user configuration, including shortcut names, URLs, enabled sta
 
 ## Privacy Disclosure Draft
 
-This extension does not collect or transmit user data. It processes tab URLs locally only to match configured shortcuts to existing browser tabs. User settings are stored in Chrome extension storage and may sync through Chrome if the user has Chrome Sync enabled.
+This extension does not collect or transmit user data. It does not request website host permissions and does not read or change page contents. It processes tab URLs locally only to match configured shortcuts to existing browser tabs. User settings are stored in Chrome extension storage and may sync through Chrome if the user has Chrome Sync enabled.
 
 ## Screenshot Ideas
 
