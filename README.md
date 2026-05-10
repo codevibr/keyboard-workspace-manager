@@ -8,7 +8,7 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 - `Ctrl+Shift+2`: focus or create Google Calendar.
 - `Ctrl+Shift+3`: focus or create Google Messages.
 - `Ctrl+Shift+4`: focus or create ChatGPT as a pinned tab.
-- Notify: assign a shortcut manually.
+- Shortcuts 5-9: assign shortcuts manually.
 - ChatGPT popup panel: assign a shortcut manually, or use the AutoHotkey companion.
 
 When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
@@ -21,7 +21,7 @@ When a service tab already exists, the extension focuses its window, activates t
 4. Select the `browser-workspace-manager` folder.
 5. Open `chrome://extensions/shortcuts` and confirm the keyboard shortcuts.
 
-Chrome allows many extension commands, but only four commands may include default suggested shortcuts in `manifest.json`. This extension ships defaults for Gmail, Calendar, Messages, and ChatGPT. Assign Notify and the ChatGPT panel manually at `chrome://extensions/shortcuts`.
+Chrome allows many extension commands, but only four commands may include default suggested shortcuts in `manifest.json`. This extension ships defaults for slots 1-4. Assign slots 5-9 and the ChatGPT panel manually at `chrome://extensions/shortcuts`.
 
 Chrome does not allow extension command shortcuts that include `Ctrl+Alt`, because that can conflict with AltGr keyboards. This is why `Ctrl+Alt+Shift+1` cannot be used directly in `manifest.json`. If you want Logitech Options+ buttons or AutoHotkey to use `Ctrl+Alt+Shift` muscle memory, bind those tools to send the Chrome-valid shortcut instead, such as `Ctrl+Shift+1`.
 
@@ -29,7 +29,16 @@ Chrome may also refuse a shortcut if another extension, Windows, the browser, Lo
 
 ## Configuration
 
-Open the extension options page from `chrome://extensions`. You can toggle debug logging, adjust pinned order healing, set the Notify URL placeholder, and tune the ChatGPT popup panel size and position.
+Open the extension options page from `chrome://extensions`. You can toggle debug logging, adjust pinned order healing, configure shortcut slots 1-9, and tune the ChatGPT popup panel size and position.
+
+Each numbered shortcut slot has:
+
+- Name shown in extension logs and options.
+- URL opened when the tab does not already exist.
+- Automatic host/path matching derived from the URL.
+- A pinned index matching the shortcut number.
+
+Chrome does not let extensions change command names dynamically in `chrome://extensions/shortcuts`, so that page shows generic names such as `Focus Shortcut 1`. The extension options page is the source of truth for your real slot names, such as `Gmail`, `Linear`, `Notion`, or `Banking`.
 
 For deeper changes, edit `src/config.js`. Each service rule supports:
 
@@ -95,7 +104,7 @@ Logs include command received, tab found or missing, tab created, tab moved, and
 
 - Shortcut does nothing: check `chrome://extensions/shortcuts`; Chrome may not have accepted the suggested shortcut.
 - Wrong tab opens: update the service `match.hosts` and `match.pathPrefixes`.
-- Notify opens `example.com`: set the real Notify URL and host in extension options.
+- A shortcut opens `example.com`: set the real name and URL for that slot in extension options.
 - ChatGPT panel appears on the wrong monitor: adjust `left` and `top` in options, or use the AutoHotkey companion.
 - Extension stops responding briefly: MV3 service workers sleep by design. The commands API wakes the worker when a shortcut is pressed.
 

@@ -84,7 +84,37 @@ footer {
   gap: 12px;
 }
 
+.slots {
+  display: grid;
+  gap: 14px;
+}
+
+.slot {
+  display: grid;
+  grid-template-columns: 72px minmax(140px, 1fr) minmax(220px, 2fr);
+  gap: 12px;
+  align-items: end;
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, CanvasText 10%, transparent);
+}
+
+.slot-number {
+  font-weight: 700;
+  padding-bottom: 9px;
+}
+
 #status {
   min-height: 20px;
   opacity: 0.78;
+}
+
+@media (max-width: 640px) {
+  .slot,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .slot-number {
+    padding-bottom: 0;
+  }
 }

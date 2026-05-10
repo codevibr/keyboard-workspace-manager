@@ -24,36 +24,48 @@
     "default_title": "Keyboard Workspace Manager"
   },
   "commands": {
-    "focus-gmail": {
+    "focus-slot-1": {
       "suggested_key": {
         "default": "Ctrl+Shift+1",
         "windows": "Ctrl+Shift+1"
       },
-      "description": "Focus Gmail"
+      "description": "Focus Shortcut 1"
     },
-    "focus-calendar": {
+    "focus-slot-2": {
       "suggested_key": {
         "default": "Ctrl+Shift+2",
         "windows": "Ctrl+Shift+2"
       },
-      "description": "Focus Google Calendar"
+      "description": "Focus Shortcut 2"
     },
-    "focus-messages": {
+    "focus-slot-3": {
       "suggested_key": {
         "default": "Ctrl+Shift+3",
         "windows": "Ctrl+Shift+3"
       },
-      "description": "Focus Google Messages"
+      "description": "Focus Shortcut 3"
     },
-    "focus-chatgpt": {
+    "focus-slot-4": {
       "suggested_key": {
         "default": "Ctrl+Shift+4",
         "windows": "Ctrl+Shift+4"
       },
-      "description": "Focus ChatGPT"
+      "description": "Focus Shortcut 4"
     },
-    "focus-notify": {
-      "description": "Focus Notify"
+    "focus-slot-5": {
+      "description": "Focus Shortcut 5"
+    },
+    "focus-slot-6": {
+      "description": "Focus Shortcut 6"
+    },
+    "focus-slot-7": {
+      "description": "Focus Shortcut 7"
+    },
+    "focus-slot-8": {
+      "description": "Focus Shortcut 8"
+    },
+    "focus-slot-9": {
+      "description": "Focus Shortcut 9"
     },
     "open-chatgpt-panel": {
       "description": "Open or focus ChatGPT floating assistant window"
