@@ -3,6 +3,7 @@
 
 ; Optional companion for stronger window placement than Chrome extensions can provide.
 ; Hotkey: Ctrl+Alt+Shift+0
+; Chrome extension manifests cannot declare Ctrl+Alt shortcuts, but AHK can.
 
 chatGptUrl := "https://chatgpt.com"
 chromeExe := "chrome.exe"
@@ -38,5 +39,6 @@ FocusOrLaunchChatGPT() {
     }
 }
 
-; Alternative: bind a Logitech Options+ key to this script or to:
+; Alternative: bind a Logitech Options+ key to this script, to the extension's
+; Chrome-valid shortcut, or to:
 ; chrome.exe --app=https://chatgpt.com

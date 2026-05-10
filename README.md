@@ -4,12 +4,12 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 
 ## What It Does
 
-- `Ctrl+Alt+Shift+1`: focus or create Gmail.
-- `Ctrl+Alt+Shift+2`: focus or create Google Calendar.
-- `Ctrl+Alt+Shift+3`: focus or create Google Messages.
-- `Ctrl+Alt+Shift+4`: focus or create ChatGPT as a pinned tab.
-- `Ctrl+Alt+Shift+5`: focus or create Notify after assigning the shortcut manually.
-- `Ctrl+Alt+Shift+0`: focus or create a ChatGPT popup panel after assigning the shortcut manually, or use the AutoHotkey companion.
+- `Ctrl+Shift+1`: focus or create Gmail.
+- `Ctrl+Shift+2`: focus or create Google Calendar.
+- `Ctrl+Shift+3`: focus or create Google Messages.
+- `Ctrl+Shift+4`: focus or create ChatGPT as a pinned tab.
+- Notify: assign a shortcut manually.
+- ChatGPT popup panel: assign a shortcut manually, or use the AutoHotkey companion.
 
 When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
 
@@ -22,6 +22,8 @@ When a service tab already exists, the extension focuses its window, activates t
 5. Open `chrome://extensions/shortcuts` and confirm the keyboard shortcuts.
 
 Chrome allows many extension commands, but only four commands may include default suggested shortcuts in `manifest.json`. This extension ships defaults for Gmail, Calendar, Messages, and ChatGPT. Assign Notify and the ChatGPT panel manually at `chrome://extensions/shortcuts`.
+
+Chrome does not allow extension command shortcuts that include `Ctrl+Alt`, because that can conflict with AltGr keyboards. This is why `Ctrl+Alt+Shift+1` cannot be used directly in `manifest.json`. If you want Logitech Options+ buttons or AutoHotkey to use `Ctrl+Alt+Shift` muscle memory, bind those tools to send the Chrome-valid shortcut instead, such as `Ctrl+Shift+1`.
 
 Chrome may also refuse a shortcut if another extension, Windows, the browser, Logitech Options+, or AutoHotkey already owns it. If that happens, set the shortcut manually at `chrome://extensions/shortcuts`, or bind your Logitech button to a less crowded shortcut such as `Ctrl+Shift+F13` and assign that shortcut in Chrome.
 

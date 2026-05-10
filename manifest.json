@@ -26,29 +26,29 @@
   "commands": {
     "focus-gmail": {
       "suggested_key": {
-        "default": "Ctrl+Alt+Shift+1",
-        "windows": "Ctrl+Alt+Shift+1"
+        "default": "Ctrl+Shift+1",
+        "windows": "Ctrl+Shift+1"
       },
       "description": "Focus Gmail"
     },
     "focus-calendar": {
       "suggested_key": {
-        "default": "Ctrl+Alt+Shift+2",
-        "windows": "Ctrl+Alt+Shift+2"
+        "default": "Ctrl+Shift+2",
+        "windows": "Ctrl+Shift+2"
       },
       "description": "Focus Google Calendar"
     },
     "focus-messages": {
       "suggested_key": {
-        "default": "Ctrl+Alt+Shift+3",
-        "windows": "Ctrl+Alt+Shift+3"
+        "default": "Ctrl+Shift+3",
+        "windows": "Ctrl+Shift+3"
       },
       "description": "Focus Google Messages"
     },
     "focus-chatgpt": {
       "suggested_key": {
-        "default": "Ctrl+Alt+Shift+4",
-        "windows": "Ctrl+Alt+Shift+4"
+        "default": "Ctrl+Shift+4",
+        "windows": "Ctrl+Shift+4"
       },
       "description": "Focus ChatGPT"
     },
