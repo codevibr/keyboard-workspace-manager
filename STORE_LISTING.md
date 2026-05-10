@@ -67,7 +67,7 @@ This extension does not collect or transmit user data. It processes tab URLs loc
 ## Publishing Checklist
 
 - Confirm `manifest.json` loads unpacked without warnings.
-- Confirm icons exist at 16, 32, 48, and 128 pixels.
+- Confirm icons exist at 16, 32, 48, and 128 pixels, plus toolbar-friendly 19, 24, and 38 pixel action icons.
 - Capture at least one Chrome Web Store screenshot.
 - Upload the 128x128 icon with the extension package.
 - Include privacy policy text or a hosted privacy policy URL.
