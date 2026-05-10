@@ -31,6 +31,10 @@ Privacy:
 
 Keyboard Workspace Manager runs locally in Chrome. It does not collect, sell, transmit, or share personal data. Configuration is stored using Chrome extension storage.
 
+Public privacy policy:
+
+https://github.com/wsfrye/keyboard-workspace-manager/blob/main/PRIVACY.md
+
 ## Category
 
 Productivity
@@ -64,13 +68,22 @@ This extension does not collect or transmit user data. It processes tab URLs loc
 - A tidy pinned tab strip after shortcut healing.
 - Floating popup window behavior.
 
+Prepared screenshots:
+
+- `store-assets/screenshot-options.png`
+- `store-assets/screenshot=pinned-tabs.png`
+
 ## Publishing Checklist
 
 - Confirm `manifest.json` loads unpacked without warnings.
 - Confirm icons exist at 16, 32, 48, and 128 pixels, plus toolbar-friendly 19, 24, and 38 pixel action icons.
 - Capture at least one Chrome Web Store screenshot.
 - Upload the 128x128 icon with the extension package.
-- Include privacy policy text or a hosted privacy policy URL.
+- Include privacy policy text or the hosted privacy policy URL.
 - Fill privacy disclosures consistently with `PRIVACY.md`.
 - Keep the listing description accurate and non-spammy.
 - Zip the extension folder contents, excluding Git metadata.
+- Confirm upgrade behavior preserves stored settings. Done.
+- Confirm disabled empty slots do nothing. Done.
+- Confirm popup shortcuts focus existing popup windows instead of duplicating. Done.
+- Confirm package ZIP contains only extension-related files. Done.

@@ -184,7 +184,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
     "focus-slot-7": "slot7",
     "focus-slot-8": "slot8",
     "focus-slot-9": "slot9",
-    "open-chatgpt-panel": "chatgptPanel"
+    "open-floating-window": "chatgptPanel"
   }
 });
 

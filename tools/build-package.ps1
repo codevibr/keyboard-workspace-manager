@@ -19,6 +19,7 @@ New-Item -ItemType Directory -Path $packageDir -Force | Out-Null
 $include = @(
     "manifest.json",
     "README.md",
+    "CHANGELOG.md",
     "PRIVACY.md",
     "src",
     "options",

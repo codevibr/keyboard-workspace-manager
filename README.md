@@ -67,7 +67,7 @@ For deeper changes, edit `src/config.js`. Each service rule supports:
 
 The extension does not send data anywhere.
 
-See `PRIVACY.md` and `STORE_LISTING.md` for Web Store-ready privacy and permissions copy.
+See `PRIVACY.md` and `STORE_LISTING.md` for Web Store-ready privacy and permissions copy. The public privacy policy is available at https://github.com/wsfrye/keyboard-workspace-manager/blob/main/PRIVACY.md.
 
 ## Floating Window Strategy
 
