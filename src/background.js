@@ -56,7 +56,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 async function updateBadge(settings) {
-  await chrome.action.setBadgeText({ text: settings.debug ? "DBG" : "" });
+  await chrome.action.setBadgeText({ text: "" });
   await chrome.action.setBadgeBackgroundColor({ color: "#2563eb" });
 }
 
