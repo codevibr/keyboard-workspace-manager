@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "Keyboard Workspace Manager",
+  "description": "Keyboard-driven pinned-tab workspace manager for Chrome power users.",
+  "version": "1.0.0",
+  "minimum_chrome_version": "114",
+  "permissions": [
+    "storage",
+    "tabs",
+    "windows"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "https://calendar.google.com/*",
+    "https://messages.google.com/*",
+    "https://chatgpt.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "options_page": "options/options.html",
+  "action": {
+    "default_title": "Keyboard Workspace Manager"
+  },
+  "commands": {
+    "focus-gmail": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+Shift+1",
+        "windows": "Ctrl+Alt+Shift+1"
+      },
+      "description": "Focus Gmail"
+    },
+    "focus-calendar": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+Shift+2",
+        "windows": "Ctrl+Alt+Shift+2"
+      },
+      "description": "Focus Google Calendar"
+    },
+    "focus-messages": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+Shift+3",
+        "windows": "Ctrl+Alt+Shift+3"
+      },
+      "description": "Focus Google Messages"
+    },
+    "focus-chatgpt": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+Shift+4",
+        "windows": "Ctrl+Alt+Shift+4"
+      },
+      "description": "Focus ChatGPT"
+    },
+    "focus-notify": {
+      "description": "Focus Notify"
+    },
+    "open-chatgpt-panel": {
+      "description": "Open or focus ChatGPT floating assistant window"
+    }
+  }
+}

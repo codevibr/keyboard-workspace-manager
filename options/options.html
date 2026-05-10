@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Keyboard Workspace Manager Options</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <h1>Keyboard Workspace Manager</h1>
+      <section>
+        <label class="row">
+          <span>
+            <strong>Debug logging</strong>
+            <small>Writes detailed service-worker logs while commands run.</small>
+          </span>
+          <input id="debug" type="checkbox">
+        </label>
+        <label class="row">
+          <span>
+            <strong>Heal pinned order</strong>
+            <small>Keeps known pinned services in their configured positions.</small>
+          </span>
+          <input id="healPinnedOrderOnStartup" type="checkbox">
+        </label>
+      </section>
+      <section>
+        <h2>Notify Placeholder</h2>
+        <label>
+          Notify URL
+          <input id="notifyUrl" type="url" placeholder="https://example.com/notify">
+        </label>
+        <label>
+          Notify Host
+          <input id="notifyHost" type="text" placeholder="example.com">
+        </label>
+        <label>
+          Notify Path Prefix
+          <input id="notifyPathPrefix" type="text" placeholder="/notify">
+        </label>
+      </section>
+      <section>
+        <h2>ChatGPT Panel</h2>
+        <div class="grid">
+          <label>Left <input id="panelLeft" type="number"></label>
+          <label>Top <input id="panelTop" type="number"></label>
+          <label>Width <input id="panelWidth" type="number"></label>
+          <label>Height <input id="panelHeight" type="number"></label>
+        </div>
+      </section>
+      <footer>
+        <button id="save" type="button">Save</button>
+        <button id="reset" type="button">Reset Defaults</button>
+        <span id="status" role="status"></span>
+      </footer>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
