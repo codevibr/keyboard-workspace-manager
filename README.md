@@ -17,15 +17,15 @@ When a service tab already exists, the extension focuses its window, activates t
 
 ### Options
 
-![Keyboard Workspace Manager options page](store-assets/store-assetsscreenshot-options-v091.png)
+![Keyboard Workspace Manager options page](store-assets/screenshot-options-v092.png)
 
-### Managed Pinned Tabs
+### Command Palette
 
-![Managed pinned tabs in Chrome](store-assets/screenshot=pinned-tabs.png)
+![Floating window shortcut](store-assets/screenshot-command-palette-v092.png)
 
 ### Floating Window
 
-![Floating window shortcut](store-assets/screenshot-floating-window.png)
+![Floating window shortcut](store-assets/screenshot-floating-window-v092.png)
 
 ## Install
 
