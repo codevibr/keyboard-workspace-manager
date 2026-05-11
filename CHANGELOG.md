@@ -2,11 +2,21 @@
 
 All notable changes to Keyboard Workspace Manager will be documented in this file.
 
+## 0.9.1 - Options Layout Polish
+
+### Changed
+
+- Improved Shortcut Slots layout so the URL field no longer overlaps the Mode dropdown.
+- Moved each slot URL onto its own row for better readability.
+- Aligned Reset buttons with the Name and Mode controls.
+- Clarified that slots 5-9 and the floating window command must be assigned manually in Chrome's extension shortcuts page.
+
 ## 0.9.0 - Initial Public Release Candidate
 
 ### Added
 
 - Configurable shortcut slots 1-9 for keyboard-driven browser workspaces.
+- Default Chrome shortcuts for slots 1-4, with slots 5-9 and the floating window command available through Chrome's extension shortcuts page.
 - Pinned-tab shortcuts that find existing tabs, focus them, pin them, and keep them in managed order.
 - Missing-tab creation for configured shortcuts.
 - Floating-window launch mode with configurable URL, position, and size.

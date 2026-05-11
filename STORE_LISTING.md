@@ -21,6 +21,7 @@ Features:
 - Create missing tabs automatically.
 - Keep managed tabs pinned and ordered.
 - Open configured shortcuts as floating popup windows.
+- Ships default shortcuts for slots 1-4; slots 5-9 and the floating window command are enabled by assigning shortcuts in Chrome's Extensions shortcuts page.
 - Configure names, URLs, launch mode, and window geometry.
 - Export and import settings as JSON.
 - Reset individual slots or restore defaults.
@@ -42,6 +43,8 @@ Productivity
 ## Single Purpose
 
 Keyboard Workspace Manager lets users configure keyboard shortcuts that focus, create, pin, order, and launch browser workspace tabs or popup windows.
+
+Chrome manages extension shortcut assignment separately from extension options. Keyboard Workspace Manager provides default shortcuts for slots 1-4. Users enable slots 5-9 and the floating window command by visiting `chrome://extensions/shortcuts` and assigning keys to those commands.
 
 ## Permissions Justification
 

@@ -8,8 +8,8 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 - `Ctrl+Shift+2`: focus or create Google Calendar.
 - `Ctrl+Shift+3`: focus or create Google Messages.
 - `Ctrl+Shift+4`: focus or create ChatGPT as a pinned tab.
-- Shortcuts 5-9: assign shortcuts manually.
-- ChatGPT popup panel: assign a shortcut manually, or use the AutoHotkey companion.
+- Shortcuts 5-9: assign shortcuts manually in Chrome's extension shortcuts page.
+- Floating window shortcut: assign it manually in Chrome's extension shortcuts page, or use the AutoHotkey companion.
 
 When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
 
@@ -21,7 +21,7 @@ When a service tab already exists, the extension focuses its window, activates t
 4. Select the `browser-workspace-manager` folder.
 5. Open `chrome://extensions/shortcuts` and confirm the keyboard shortcuts.
 
-Chrome allows many extension commands, but only four commands may include default suggested shortcuts in `manifest.json`. This extension ships defaults for slots 1-4. Assign slots 5-9 and the ChatGPT panel manually at `chrome://extensions/shortcuts`.
+Chrome allows many extension commands, but only four commands may include default suggested shortcuts in `manifest.json`. This extension ships defaults for slots 1-4. To enable slots 5-9 and the floating window command, open `chrome://extensions/shortcuts`, find Keyboard Workspace Manager, and assign keys to `Focus Shortcut 5` through `Focus Shortcut 9` and `Open Floating Window`.
 
 Chrome does not allow extension command shortcuts that include `Ctrl+Alt`, because that can conflict with AltGr keyboards. This is why `Ctrl+Alt+Shift+1` cannot be used directly in `manifest.json`. If you want Logitech Options+ buttons or AutoHotkey to use `Ctrl+Alt+Shift` muscle memory, bind those tools to send the Chrome-valid shortcut instead, such as `Ctrl+Shift+1`.
 
@@ -44,6 +44,8 @@ Blank URLs are treated as disabled slots. Disabled slots do nothing when their c
 Pinned tab ordering is compressed across enabled pinned-tab slots only. For example, if slot 3 is configured as a floating window, then slot 4 becomes the third managed pinned tab rather than leaving an empty gap in the pinned tab strip.
 
 Chrome does not let extensions change command names dynamically in `chrome://extensions/shortcuts`, so that page shows generic names such as `Focus Shortcut 1`. The extension options page is the source of truth for your real slot names, such as `Gmail`, `Linear`, `Notion`, or `Banking`.
+
+Configuring a slot in the options page does not automatically create its Chrome keyboard shortcut. Chrome keeps shortcut assignment in `chrome://extensions/shortcuts`, so use the options page to define what each slot opens and Chrome's shortcuts page to define which key triggers it.
 
 Use `Export` and `Import` on the options page to back up or move your settings. Use each slot's reset button to restore one slot, or `Reset Defaults` to restore the full configuration.
 
@@ -113,6 +115,7 @@ Logs include command received, tab found or missing, tab created, tab moved, and
 ## Troubleshooting
 
 - Shortcut does nothing: check `chrome://extensions/shortcuts`; Chrome may not have accepted the suggested shortcut.
+- Slots 5-9 or floating window do nothing: assign those commands manually in `chrome://extensions/shortcuts`.
 - Wrong tab opens: update the service `match.hosts` and `match.pathPrefixes`.
 - A shortcut opens `example.com`: set the real name and URL for that slot in extension options.
 - ChatGPT panel appears on the wrong monitor: adjust `left` and `top` in options, or use the AutoHotkey companion.

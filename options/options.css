@@ -35,6 +35,7 @@ label {
   gap: 6px;
   margin: 0 0 14px;
   font-size: 14px;
+  min-width: 0;
 }
 
 small {
@@ -44,6 +45,9 @@ small {
 }
 
 input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   font: inherit;
   padding: 8px 10px;
   border: 1px solid color-mix(in srgb, CanvasText 24%, transparent);
@@ -53,6 +57,9 @@ input {
 }
 
 select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   font: inherit;
   padding: 8px 10px;
   border: 1px solid color-mix(in srgb, CanvasText 24%, transparent);
@@ -101,19 +108,29 @@ footer {
 
 .slot {
   display: grid;
-  grid-template-columns: 88px minmax(140px, 1fr) minmax(220px, 2fr) 132px 80px;
+  grid-template-columns: 76px 112px minmax(140px, 1fr) 150px 80px;
+  grid-template-areas:
+    "number enabled name mode reset"
+    ". . url url url"
+    "window window window window window";
   gap: 12px;
   align-items: end;
   padding: 12px 0;
   border-bottom: 1px solid color-mix(in srgb, CanvasText 10%, transparent);
 }
 
+.slot label {
+  margin: 0;
+}
+
 .slot-number {
+  grid-area: number;
   font-weight: 700;
   padding-bottom: 9px;
 }
 
 .slot-enabled {
+  grid-area: enabled;
   align-self: center;
   display: flex;
   align-items: center;
@@ -121,8 +138,26 @@ footer {
   margin: 0;
 }
 
+.slot-name {
+  grid-area: name;
+}
+
+.slot-url {
+  grid-area: url;
+}
+
+.slot-mode {
+  grid-area: mode;
+}
+
+.slot-reset {
+  grid-area: reset;
+  align-self: end;
+  min-height: 38px;
+}
+
 .slot-window {
-  grid-column: 2 / -1;
+  grid-area: window;
   display: grid;
   grid-template-columns: repeat(4, minmax(90px, 1fr));
   gap: 12px;
@@ -138,7 +173,18 @@ footer {
 }
 
 @media (max-width: 640px) {
-  .slot,
+  .slot {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "number"
+      "enabled"
+      "name"
+      "url"
+      "mode"
+      "reset"
+      "window";
+  }
+
   .slot-window,
   .grid {
     grid-template-columns: 1fr;

@@ -136,22 +136,22 @@ function renderSlots(nextSettings) {
         <input id="slot${slot}Enabled" type="checkbox">
         Enabled
       </label>
-      <label>
+      <label class="slot-name">
         Name
         <input id="slot${slot}Name" type="text">
       </label>
-      <label>
+      <label class="slot-url">
         URL
         <input id="slot${slot}Url" type="url">
       </label>
-      <label>
+      <label class="slot-mode">
         Mode
         <select id="slot${slot}Mode">
           <option value="pinnedTab">Pinned tab</option>
           <option value="popupWindow">Floating window</option>
         </select>
       </label>
-      <button id="slot${slot}Reset" type="button">Reset</button>
+      <button id="slot${slot}Reset" class="slot-reset" type="button">Reset</button>
       <div id="slot${slot}Window" class="slot-window">
         <label>Left <input id="slot${slot}Left" type="number"></label>
         <label>Top <input id="slot${slot}Top" type="number"></label>
