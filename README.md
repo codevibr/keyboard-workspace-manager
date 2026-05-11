@@ -17,7 +17,7 @@ When a service tab already exists, the extension focuses its window, activates t
 
 ### Options
 
-![Keyboard Workspace Manager options page](store-assets/screenshot-options.png)
+![Keyboard Workspace Manager options page](store-assets/store-assetsscreenshot-options-v091.png)
 
 ### Managed Pinned Tabs
 
