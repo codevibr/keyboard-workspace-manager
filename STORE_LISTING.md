@@ -33,7 +33,7 @@ Keyboard Workspace Manager runs locally in Chrome. It does not collect, sell, tr
 
 Public privacy policy:
 
-https://github.com/wsfrye/keyboard-workspace-manager/blob/main/PRIVACY.md
+https://github.com/codevibr/keyboard-workspace-manager/blob/main/PRIVACY.md
 
 ## Category
 
