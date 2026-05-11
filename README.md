@@ -13,6 +13,20 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 
 When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
 
+## Screenshots
+
+### Options
+
+![Keyboard Workspace Manager options page](store-assets/screenshot-options.png)
+
+### Managed Pinned Tabs
+
+![Managed pinned tabs in Chrome](store-assets/screenshot=pinned-tabs.png)
+
+### Floating Window
+
+![Floating window shortcut](store-assets/screenshot-floating-window.png)
+
 ## Install
 
 1. Open Chrome and go to `chrome://extensions`.
