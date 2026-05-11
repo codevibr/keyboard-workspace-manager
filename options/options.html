@@ -7,60 +7,158 @@
     <link rel="stylesheet" href="options.css">
   </head>
   <body>
-    <main>
-      <h1>Keyboard Workspace Manager</h1>
-      <section>
-        <label class="row">
-          <span>
-            <strong>Debug logging</strong>
-            <small>Writes detailed service-worker logs while commands run.</small>
-          </span>
-          <input id="debug" type="checkbox">
-        </label>
-        <label class="row">
-          <span>
-            <strong>Heal pinned order</strong>
-            <small>Keeps known pinned services in their configured positions.</small>
-          </span>
-          <input id="healPinnedOrderOnStartup" type="checkbox">
-        </label>
-      </section>
-      <section>
-        <h2>Shortcut Slots</h2>
-        <div id="slots" class="slots"></div>
-      </section>
-      <section>
-        <h2>Floating Shortcut</h2>
-        <label class="row">
-          <span>
-            <strong>Enable floating shortcut</strong>
-            <small>Assign this command manually in Chrome shortcuts if needed.</small>
-          </span>
-          <input id="panelEnabled" type="checkbox">
-        </label>
-        <label>
-          Name
-          <input id="panelName" type="text">
-        </label>
-        <label>
-          URL
-          <input id="panelUrl" type="url">
-        </label>
-        <div class="grid">
-          <label>Left <input id="panelLeft" type="number"></label>
-          <label>Top <input id="panelTop" type="number"></label>
-          <label>Width <input id="panelWidth" type="number"></label>
-          <label>Height <input id="panelHeight" type="number"></label>
+    <main class="app-shell">
+      <aside class="sidebar" aria-label="Options sections">
+        <div class="brand">
+          <img class="brand-mark" src="../icons/icon-48.png" alt="" width="48" height="48">
+          <div>
+            <strong>Keyboard</strong>
+            <span>Workspace Manager</span>
+          </div>
         </div>
-      </section>
-      <footer>
-        <button id="save" type="button">Save</button>
-        <button id="reset" type="button">Reset Defaults</button>
-        <button id="exportSettings" type="button">Export</button>
-        <button id="importSettings" type="button">Import</button>
-        <input id="importFile" type="file" accept="application/json,.json" hidden>
-        <span id="status" role="status"></span>
-      </footer>
+        <nav class="side-nav">
+          <button class="nav-item active" type="button" data-view-tab="workspaces">Workspaces</button>
+          <button class="nav-item" type="button" data-view-tab="settings">Settings</button>
+          <button class="nav-item" type="button" data-view-tab="import-export">Import/Export</button>
+          <button class="nav-item" type="button" data-view-tab="about">About</button>
+        </nav>
+        <div class="help-card">
+          <p><strong>Need help?</strong> Visit project README for setup guides and tips.</p>
+          <a href="https://github.com/codevibr/keyboard-workspace-manager" target="_blank" rel="noreferrer">
+            Visit on GitHub
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M15 3h6v6"></path>
+              <path d="M10 14 21 3"></path>
+              <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path>
+            </svg>
+          </a>
+          <dl>
+            <div>
+              <dt>Version</dt>
+              <dd>0.9.2</dd>
+            </div>
+          </dl>
+          <p class="made-with">Made with ❤️ for power users.</p>
+        </div>
+      </aside>
+
+      <div class="content">
+        <header class="page-header">
+          <p class="eyebrow">Chrome Extension Options</p>
+          <h1>Keyboard Workspace Manager</h1>
+          <p class="subtitle">Configure command slots, launcher entries, and floating window geometry.</p>
+        </header>
+
+        <section class="view active" data-view="workspaces">
+          <section class="panel hero-panel">
+            <div>
+              <h2>Keyboard Slots</h2>
+              <p class="panel-copy">Slots 1-4 ship with defaults. Assign slots 5-10 in Chrome's extension shortcuts page.</p>
+            </div>
+            <div class="button-row">
+              <button id="openChromeShortcuts" class="shortcut-link" type="button">Chrome shortcuts</button>
+              <button class="reset-defaults danger-button" type="button">Reset to default</button>
+            </div>
+          </section>
+
+          <section class="panel workspace-panel">
+            <div class="slot-table-header" aria-hidden="true">
+              <span>Slot</span>
+              <span>On</span>
+              <span>Name</span>
+              <span>URL</span>
+              <span>Mode</span>
+              <span>Window</span>
+              <span></span>
+            </div>
+            <div id="slots" class="slots"></div>
+          </section>
+
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>Launcher Entries</h2>
+                <p class="panel-copy">Extra launch targets for the toolbar command palette.</p>
+              </div>
+              <button id="addLauncherEntry" type="button">Add Entry</button>
+            </div>
+            <div id="launcherEntries" class="launcher-entries"></div>
+          </section>
+        </section>
+
+        <section class="view" data-view="settings" hidden>
+          <section class="panel hero-panel">
+            <div>
+              <h2>Settings</h2>
+              <p class="panel-copy">Debugging and pinned-order behavior.</p>
+            </div>
+            <button class="reset-defaults danger-button" type="button">Reset to default</button>
+          </section>
+          <section class="panel settings-panel">
+            <label class="row">
+              <span>
+                <strong>Debug logging</strong>
+                <small>Writes detailed service-worker logs while commands run.</small>
+              </span>
+              <input id="debug" type="checkbox">
+            </label>
+            <label class="row">
+              <span>
+                <strong>Heal pinned order</strong>
+                <small>Keeps known pinned services in their configured positions.</small>
+              </span>
+              <input id="healPinnedOrderOnStartup" type="checkbox">
+            </label>
+          </section>
+        </section>
+
+        <section class="view" data-view="import-export" hidden>
+          <section class="panel import-panel">
+            <div>
+              <h2>Settings Portability</h2>
+              <p class="panel-copy">Back up, restore, or reset your local workspace configuration.</p>
+            </div>
+            <div class="button-row">
+              <button id="exportSettings" type="button">Export</button>
+              <button id="importSettings" type="button">Import</button>
+              <button class="reset-defaults danger-button" type="button">Reset to default</button>
+              <input id="importFile" type="file" accept="application/json,.json" hidden>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" data-view="about" hidden>
+          <section class="panel hero-panel">
+            <div>
+              <h2>About</h2>
+              <p class="panel-copy">Project details, privacy posture, and license.</p>
+            </div>
+            <button class="reset-defaults danger-button" type="button">Reset to default</button>
+          </section>
+          <section class="panel about-panel">
+            <p class="panel-copy">Manifest V3 workspace shortcuts for pinned tabs, popup windows, and keyboard-first Chrome workflows.</p>
+            <dl>
+              <div>
+                <dt>Shortcut commands</dt>
+                <dd>Slots 1-10 are declared in the manifest. Slots 5-10 require manual assignment in Chrome.</dd>
+              </div>
+              <div>
+                <dt>Privacy</dt>
+                <dd>No host permissions, no content scripts, and no network tracking. Tab URLs are checked locally for matching.</dd>
+              </div>
+              <div>
+                <dt>License</dt>
+                <dd>Released under the MIT License. See the project LICENSE file for the full text.</dd>
+              </div>
+            </dl>
+          </section>
+        </section>
+
+        <footer class="action-bar">
+          <button id="save" type="button">Save Changes</button>
+          <span id="status" role="status"></span>
+        </footer>
+      </div>
     </main>
     <script type="module" src="options.js"></script>
   </body>

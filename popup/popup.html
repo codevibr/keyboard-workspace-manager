@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Keyboard Workspace Manager</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Workspace</h1>
+          <p>Launch tabs and windows</p>
+        </div>
+        <button id="openOptions" type="button" title="Open options">Options</button>
+      </header>
+      <label class="search">
+        <span>Search</span>
+        <input id="query" type="search" placeholder="Search workspaces..." autocomplete="off">
+      </label>
+      <section id="launcherSection">
+        <h2>Launcher Entries</h2>
+        <div id="launcherEntries" class="entries"></div>
+      </section>
+      <section id="keyboardSection">
+        <h2>Keyboard Slots</h2>
+        <div id="keyboardSlots" class="entries"></div>
+      </section>
+      <p id="emptyState" hidden>No matching workspaces.</p>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

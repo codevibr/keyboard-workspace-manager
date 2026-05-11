@@ -21,8 +21,10 @@ $include = @(
     "README.md",
     "CHANGELOG.md",
     "PRIVACY.md",
+    "LICENSE",
     "src",
     "options",
+    "popup",
     "icons"
 )
 

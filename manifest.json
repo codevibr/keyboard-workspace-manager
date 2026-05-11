@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Keyboard Workspace Manager",
   "description": "Keyboard shortcuts for configurable pinned tabs and floating browser workspaces.",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "minimum_chrome_version": "114",
   "permissions": [
     "storage",
@@ -22,6 +22,7 @@
   "options_page": "options/options.html",
   "action": {
     "default_title": "Keyboard Workspace Manager",
+    "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
       "19": "icons/icon-19.png",
@@ -33,51 +34,54 @@
     }
   },
   "commands": {
-    "focus-slot-1": {
+    "focus-slot-01": {
       "suggested_key": {
         "default": "Ctrl+Shift+1",
         "windows": "Ctrl+Shift+1"
       },
       "description": "Focus Shortcut 1"
     },
-    "focus-slot-2": {
+    "focus-slot-02": {
       "suggested_key": {
         "default": "Ctrl+Shift+2",
         "windows": "Ctrl+Shift+2"
       },
       "description": "Focus Shortcut 2"
     },
-    "focus-slot-3": {
+    "focus-slot-03": {
       "suggested_key": {
         "default": "Ctrl+Shift+3",
         "windows": "Ctrl+Shift+3"
       },
       "description": "Focus Shortcut 3"
     },
-    "focus-slot-4": {
+    "focus-slot-04": {
       "suggested_key": {
         "default": "Ctrl+Shift+4",
         "windows": "Ctrl+Shift+4"
       },
       "description": "Focus Shortcut 4"
     },
-    "focus-slot-5": {
+    "focus-slot-05": {
       "description": "Focus Shortcut 5"
     },
-    "focus-slot-6": {
+    "focus-slot-06": {
       "description": "Focus Shortcut 6"
     },
-    "focus-slot-7": {
+    "focus-slot-07": {
       "description": "Focus Shortcut 7"
     },
-    "focus-slot-8": {
+    "focus-slot-08": {
       "description": "Focus Shortcut 8"
     },
-    "focus-slot-9": {
+    "focus-slot-09": {
       "description": "Focus Shortcut 9"
     },
-    "open-floating-window": {
-      "description": "Open Floating Window"
+    "focus-slot-10": {
+      "description": "Focus Shortcut 10"
+    },
+    "open-command-palette": {
+      "description": "Open Command Palette"
     }
   }
 }

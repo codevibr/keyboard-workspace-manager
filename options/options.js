@@ -2,18 +2,16 @@ import { DEFAULT_SETTINGS, STORAGE_KEYS } from "../src/config.js";
 import { getSettings, saveSettings } from "../src/storage.js";
 
 const fields = {
+  navItems: document.querySelectorAll("[data-view-tab]"),
+  views: document.querySelectorAll("[data-view]"),
   debug: document.querySelector("#debug"),
   healPinnedOrderOnStartup: document.querySelector("#healPinnedOrderOnStartup"),
   slots: document.querySelector("#slots"),
-  panelEnabled: document.querySelector("#panelEnabled"),
-  panelName: document.querySelector("#panelName"),
-  panelUrl: document.querySelector("#panelUrl"),
-  panelLeft: document.querySelector("#panelLeft"),
-  panelTop: document.querySelector("#panelTop"),
-  panelWidth: document.querySelector("#panelWidth"),
-  panelHeight: document.querySelector("#panelHeight"),
+  launcherEntries: document.querySelector("#launcherEntries"),
+  addLauncherEntry: document.querySelector("#addLauncherEntry"),
+  openChromeShortcuts: document.querySelector("#openChromeShortcuts"),
+  resetDefaults: document.querySelectorAll(".reset-defaults"),
   save: document.querySelector("#save"),
-  reset: document.querySelector("#reset"),
   exportSettings: document.querySelector("#exportSettings"),
   importSettings: document.querySelector("#importSettings"),
   importFile: document.querySelector("#importFile"),
@@ -23,11 +21,15 @@ const fields = {
 let settings = await getSettings();
 render(settings);
 
+for (const item of fields.navItems) {
+  item.addEventListener("click", () => showView(item.dataset.viewTab));
+}
+
 fields.save.addEventListener("click", async () => {
   settings.debug = fields.debug.checked;
   settings.healPinnedOrderOnStartup = fields.healPinnedOrderOnStartup.checked;
 
-  for (let slot = 1; slot <= 9; slot += 1) {
+  for (let slot = 1; slot <= 10; slot += 1) {
     const service = settings.services[`slot${slot}`];
     const defaultService = DEFAULT_SETTINGS.services[`slot${slot}`];
     const name = document.querySelector(`#slot${slot}Name`).value.trim();
@@ -50,30 +52,16 @@ fields.save.addEventListener("click", async () => {
     };
   }
 
-  const panelUrl = normalizeUrl(fields.panelUrl.value.trim());
-  settings.services.chatgptPanel.enabled = fields.panelEnabled.checked && Boolean(panelUrl);
-  settings.services.chatgptPanel.name = fields.panelName.value.trim() || DEFAULT_SETTINGS.services.chatgptPanel.name;
-  settings.services.chatgptPanel.url = panelUrl;
-  settings.services.chatgptPanel.match = matchFromUrl(settings.services.chatgptPanel.url);
-  settings.services.chatgptPanel.launchMode = "popupWindow";
-  settings.services.chatgptPanel.windowPreference = "popup";
-  settings.services.chatgptPanel.popup.left = toNumber(fields.panelLeft.value, DEFAULT_SETTINGS.services.chatgptPanel.popup.left);
-  settings.services.chatgptPanel.popup.top = toNumber(fields.panelTop.value, DEFAULT_SETTINGS.services.chatgptPanel.popup.top);
-  settings.services.chatgptPanel.popup.width = toNumber(fields.panelWidth.value, DEFAULT_SETTINGS.services.chatgptPanel.popup.width);
-  settings.services.chatgptPanel.popup.height = toNumber(fields.panelHeight.value, DEFAULT_SETTINGS.services.chatgptPanel.popup.height);
+  settings.launcherEntries = readLauncherEntries();
 
   settings = await saveSettings(settings);
   chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
   showStatus("Saved.");
 });
 
-fields.reset.addEventListener("click", async () => {
-  await chrome.storage.sync.remove(STORAGE_KEYS.settings);
-  settings = await getSettings();
-  render(settings);
-  chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
-  showStatus("Defaults restored.");
-});
+for (const resetButton of fields.resetDefaults) {
+  resetButton.addEventListener("click", resetToDefaults);
+}
 
 fields.exportSettings.addEventListener("click", () => {
   const payload = JSON.stringify(settings, null, 2);
@@ -110,31 +98,71 @@ fields.importFile.addEventListener("change", async () => {
   }
 });
 
+fields.addLauncherEntry.addEventListener("click", () => {
+  settings.launcherEntries = settings.launcherEntries || [];
+  settings.launcherEntries.push(createLauncherEntry());
+  render(settings);
+  showStatus("Entry added. Save to keep it.");
+});
+
+fields.openChromeShortcuts.addEventListener("click", async () => {
+  const shortcutsUrl = "chrome://extensions/shortcuts";
+
+  try {
+    await chrome.tabs.create({ url: shortcutsUrl });
+    showStatus("Opening Chrome shortcuts.");
+  } catch {
+    try {
+      await navigator.clipboard.writeText(shortcutsUrl);
+      showStatus("Chrome blocked the page. URL copied.");
+    } catch {
+      showStatus(`Open manually: ${shortcutsUrl}`);
+    }
+  }
+});
+
+async function resetToDefaults() {
+  await chrome.storage.sync.remove(STORAGE_KEYS.settings);
+  settings = await getSettings();
+  render(settings);
+  chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
+  showStatus("Defaults restored.");
+}
+
+function showView(viewName) {
+  for (const item of fields.navItems) {
+    item.classList.toggle("active", item.dataset.viewTab === viewName);
+  }
+
+  for (const view of fields.views) {
+    const active = view.dataset.view === viewName;
+    view.hidden = !active;
+    view.classList.toggle("active", active);
+  }
+}
+
 function render(nextSettings) {
   fields.debug.checked = nextSettings.debug;
   fields.healPinnedOrderOnStartup.checked = nextSettings.healPinnedOrderOnStartup;
   renderSlots(nextSettings);
-  fields.panelEnabled.checked = Boolean(nextSettings.services.chatgptPanel.enabled && nextSettings.services.chatgptPanel.url);
-  fields.panelName.value = nextSettings.services.chatgptPanel.name;
-  fields.panelUrl.value = nextSettings.services.chatgptPanel.url;
-  fields.panelLeft.value = nextSettings.services.chatgptPanel.popup.left;
-  fields.panelTop.value = nextSettings.services.chatgptPanel.popup.top;
-  fields.panelWidth.value = nextSettings.services.chatgptPanel.popup.width;
-  fields.panelHeight.value = nextSettings.services.chatgptPanel.popup.height;
+  renderLauncherEntries(nextSettings);
 }
 
 function renderSlots(nextSettings) {
   fields.slots.textContent = "";
 
-  for (let slot = 1; slot <= 9; slot += 1) {
+  for (let slot = 1; slot <= 10; slot += 1) {
     const service = nextSettings.services[`slot${slot}`];
     const row = document.createElement("div");
     row.className = "slot";
     row.innerHTML = `
-      <div class="slot-number">Slot ${slot}</div>
-      <label class="slot-enabled">
+      <div class="slot-number">
+        <span>Slot</span>
+        <strong>${slot}</strong>
+      </div>
+      <label class="switch-control slot-enabled" title="Enable slot ${slot}">
         <input id="slot${slot}Enabled" type="checkbox">
-        Enabled
+        <span class="switch-track"></span>
       </label>
       <label class="slot-name">
         Name
@@ -151,12 +179,28 @@ function renderSlots(nextSettings) {
           <option value="popupWindow">Floating window</option>
         </select>
       </label>
-      <button id="slot${slot}Reset" class="slot-reset" type="button">Reset</button>
       <div id="slot${slot}Window" class="slot-window">
         <label>Left <input id="slot${slot}Left" type="number"></label>
         <label>Top <input id="slot${slot}Top" type="number"></label>
         <label>Width <input id="slot${slot}Width" type="number"></label>
         <label>Height <input id="slot${slot}Height" type="number"></label>
+      </div>
+      <div class="slot-actions">
+        <button id="slot${slot}Edit" class="icon-button slot-edit" type="button" aria-label="Edit slot ${slot}" title="Edit slot ${slot}">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+          </svg>
+        </button>
+        <button id="slot${slot}Delete" class="icon-button slot-delete" type="button" aria-label="Delete slot ${slot}" title="Delete slot ${slot}">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4h8v2"></path>
+            <path d="M19 6l-1 14H6L5 6"></path>
+            <path d="M10 11v5"></path>
+            <path d="M14 11v5"></path>
+          </svg>
+        </button>
       </div>
     `;
 
@@ -172,12 +216,143 @@ function renderSlots(nextSettings) {
     updateWindowFields(slot);
 
     document.querySelector(`#slot${slot}Mode`).addEventListener("change", () => updateWindowFields(slot));
-    document.querySelector(`#slot${slot}Reset`).addEventListener("click", () => {
-      settings.services[`slot${slot}`] = structuredClone(DEFAULT_SETTINGS.services[`slot${slot}`]);
-      render(settings);
-      showStatus(`Slot ${slot} reset. Save to keep it.`);
+    document.querySelector(`#slot${slot}Edit`).addEventListener("click", () => {
+      row.classList.add("is-editing");
+      document.querySelector(`#slot${slot}Name`).focus();
+      showStatus(`Slot ${slot} ready to edit.`);
+    });
+    document.querySelector(`#slot${slot}Delete`).addEventListener("click", () => {
+      document.querySelector(`#slot${slot}Enabled`).checked = false;
+      document.querySelector(`#slot${slot}Name`).value = DEFAULT_SETTINGS.services[`slot${slot}`].name;
+      document.querySelector(`#slot${slot}Url`).value = "";
+      document.querySelector(`#slot${slot}Mode`).value = "pinnedTab";
+      updateWindowFields(slot);
+      showStatus(`Slot ${slot} cleared. Save to keep it.`);
     });
   }
+}
+
+function renderLauncherEntries(nextSettings) {
+  fields.launcherEntries.textContent = "";
+
+  for (const entry of nextSettings.launcherEntries || []) {
+    const row = document.createElement("div");
+    row.className = "launcher-entry";
+    row.dataset.entryId = entry.id;
+    row.innerHTML = `
+      <label class="launcher-enabled">
+        <input id="${entry.id}Enabled" data-entry-field="enabled" type="checkbox">
+        Enabled
+      </label>
+      <label class="launcher-name">
+        Name
+        <input id="${entry.id}Name" data-entry-field="name" type="text">
+      </label>
+      <label class="launcher-url">
+        URL
+        <input id="${entry.id}Url" data-entry-field="url" type="url">
+      </label>
+      <label class="launcher-tags">
+        Tags
+        <input id="${entry.id}Tags" data-entry-field="tags" type="text" placeholder="work, docs, finance">
+      </label>
+      <label class="launcher-mode">
+        Mode
+        <select id="${entry.id}Mode" data-entry-field="launchMode">
+          <option value="pinnedTab">Regular tab</option>
+          <option value="popupWindow">Floating window</option>
+        </select>
+      </label>
+      <button id="${entry.id}Reset" class="icon-button launcher-reset" type="button" aria-label="Delete launcher entry" title="Delete launcher entry">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4h8v2"></path>
+          <path d="M19 6l-1 14H6L5 6"></path>
+          <path d="M10 11v5"></path>
+          <path d="M14 11v5"></path>
+        </svg>
+      </button>
+      <div id="${entry.id}Window" class="launcher-window">
+        <label>Left <input id="${entry.id}Left" data-entry-field="left" type="number"></label>
+        <label>Top <input id="${entry.id}Top" data-entry-field="top" type="number"></label>
+        <label>Width <input id="${entry.id}Width" data-entry-field="width" type="number"></label>
+        <label>Height <input id="${entry.id}Height" data-entry-field="height" type="number"></label>
+      </div>
+    `;
+
+    fields.launcherEntries.append(row);
+    row.querySelector(`[data-entry-field="enabled"]`).checked = Boolean(entry.enabled && entry.url);
+    row.querySelector(`[data-entry-field="name"]`).value = entry.name || "";
+    row.querySelector(`[data-entry-field="url"]`).value = entry.url || "";
+    row.querySelector(`[data-entry-field="tags"]`).value = (entry.tags || []).join(", ");
+    row.querySelector(`[data-entry-field="launchMode"]`).value = entry.launchMode || "pinnedTab";
+    row.querySelector(`[data-entry-field="left"]`).value = entry.popup?.left ?? 120;
+    row.querySelector(`[data-entry-field="top"]`).value = entry.popup?.top ?? 80;
+    row.querySelector(`[data-entry-field="width"]`).value = entry.popup?.width ?? 520;
+    row.querySelector(`[data-entry-field="height"]`).value = entry.popup?.height ?? 720;
+    updateLauncherWindowFields(row);
+
+    row.querySelector(`[data-entry-field="launchMode"]`).addEventListener("change", () => updateLauncherWindowFields(row));
+    row.querySelector(`#${entry.id}Reset`).addEventListener("click", () => {
+      settings.launcherEntries = (settings.launcherEntries || []).filter((candidate) => candidate.id !== entry.id);
+      render(settings);
+      showStatus("Entry deleted. Save to keep it.");
+    });
+  }
+}
+
+function readLauncherEntries() {
+  return [...fields.launcherEntries.querySelectorAll(".launcher-entry")].map((row) => {
+    const id = row.dataset.entryId;
+    const url = normalizeUrl(row.querySelector(`[data-entry-field="url"]`).value.trim());
+    const launchMode = row.querySelector(`[data-entry-field="launchMode"]`).value;
+
+    return {
+      id,
+      enabled: row.querySelector(`[data-entry-field="enabled"]`).checked && Boolean(url),
+      name: row.querySelector(`[data-entry-field="name"]`).value.trim() || "Untitled",
+      url,
+      match: matchFromUrl(url),
+      launchMode,
+      pinned: false,
+      pinnedIndex: null,
+      windowPreference: launchMode === "popupWindow" ? "popup" : "current",
+      popup: {
+        left: toNumber(row.querySelector(`[data-entry-field="left"]`).value, 120),
+        top: toNumber(row.querySelector(`[data-entry-field="top"]`).value, 80),
+        width: toNumber(row.querySelector(`[data-entry-field="width"]`).value, 520),
+        height: toNumber(row.querySelector(`[data-entry-field="height"]`).value, 720)
+      },
+      tags: row.querySelector(`[data-entry-field="tags"]`).value
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+    };
+  });
+}
+
+function createLauncherEntry() {
+  return {
+    id: `launcher-${Date.now().toString(36)}`,
+    enabled: false,
+    name: "New Entry",
+    url: "",
+    match: {
+      hosts: [],
+      pathPrefixes: ["/"]
+    },
+    launchMode: "pinnedTab",
+    pinned: false,
+    pinnedIndex: null,
+    windowPreference: "current",
+    popup: {
+      left: 120,
+      top: 80,
+      width: 520,
+      height: 720
+    },
+    tags: []
+  };
 }
 
 function matchFromUrl(value) {
@@ -240,7 +415,17 @@ function showStatus(text) {
 
 function updateWindowFields(slot) {
   const mode = document.querySelector(`#slot${slot}Mode`).value;
-  document.querySelector(`#slot${slot}Window`).hidden = mode !== "popupWindow";
+  const windowFields = document.querySelector(`#slot${slot}Window`);
+  const disabled = mode !== "popupWindow";
+  windowFields.classList.toggle("is-disabled", disabled);
+  for (const input of windowFields.querySelectorAll("input")) {
+    input.disabled = disabled;
+  }
+}
+
+function updateLauncherWindowFields(row) {
+  const mode = row.querySelector(`[data-entry-field="launchMode"]`).value;
+  row.querySelector(".launcher-window").hidden = mode !== "popupWindow";
 }
 
 function defaultPopupFor(slot) {

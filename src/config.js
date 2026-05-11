@@ -3,6 +3,56 @@ export const CONFIG_VERSION = 1;
 export const DEFAULT_SETTINGS = Object.freeze({
   debug: false,
   healPinnedOrderOnStartup: true,
+  launcherEntries: [
+    {
+      id: "launcher-linear",
+      enabled: false,
+      name: "Linear",
+      url: "",
+      match: {
+        hosts: [],
+        pathPrefixes: ["/"]
+      },
+      launchMode: "pinnedTab",
+      pinned: false,
+      pinnedIndex: null,
+      windowPreference: "current",
+      popup: null,
+      tags: ["work"]
+    },
+    {
+      id: "launcher-notion",
+      enabled: false,
+      name: "Notion",
+      url: "",
+      match: {
+        hosts: [],
+        pathPrefixes: ["/"]
+      },
+      launchMode: "pinnedTab",
+      pinned: false,
+      pinnedIndex: null,
+      windowPreference: "current",
+      popup: null,
+      tags: ["notes"]
+    },
+    {
+      id: "launcher-github",
+      enabled: false,
+      name: "GitHub",
+      url: "https://github.com",
+      match: {
+        hosts: ["github.com"],
+        pathPrefixes: ["/"]
+      },
+      launchMode: "pinnedTab",
+      pinned: false,
+      pinnedIndex: null,
+      windowPreference: "current",
+      popup: null,
+      tags: ["code"]
+    }
+  ],
   services: {
     slot1: {
       id: "slot1",
@@ -153,38 +203,34 @@ export const DEFAULT_SETTINGS = Object.freeze({
       windowPreference: "current",
       popup: null
     },
-    chatgptPanel: {
-      id: "chatgptPanel",
-      enabled: true,
-      name: "Floating Window",
-      url: "https://chatgpt.com",
+    slot10: {
+      id: "slot10",
+      slot: 10,
+      enabled: false,
+      name: "Shortcut 10",
+      url: "",
       match: {
-        hosts: ["chatgpt.com", "www.chatgpt.com"],
+        hosts: [],
         pathPrefixes: ["/"]
       },
-      pinnedIndex: null,
-      pinned: false,
-      launchMode: "popupWindow",
-      windowPreference: "popup",
-      popup: {
-        width: 520,
-        height: 860,
-        left: 1940,
-        top: 80
-      }
+      pinnedIndex: 9,
+      pinned: true,
+      launchMode: "pinnedTab",
+      windowPreference: "current",
+      popup: null
     }
   },
   commandMap: {
-    "focus-slot-1": "slot1",
-    "focus-slot-2": "slot2",
-    "focus-slot-3": "slot3",
-    "focus-slot-4": "slot4",
-    "focus-slot-5": "slot5",
-    "focus-slot-6": "slot6",
-    "focus-slot-7": "slot7",
-    "focus-slot-8": "slot8",
-    "focus-slot-9": "slot9",
-    "open-floating-window": "chatgptPanel"
+    "focus-slot-01": "slot1",
+    "focus-slot-02": "slot2",
+    "focus-slot-03": "slot3",
+    "focus-slot-04": "slot4",
+    "focus-slot-05": "slot5",
+    "focus-slot-06": "slot6",
+    "focus-slot-07": "slot7",
+    "focus-slot-08": "slot8",
+    "focus-slot-09": "slot9",
+    "focus-slot-10": "slot10"
   }
 });
 

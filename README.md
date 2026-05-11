@@ -8,8 +8,8 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 - `Ctrl+Shift+2`: focus or create Google Calendar.
 - `Ctrl+Shift+3`: focus or create Google Messages.
 - `Ctrl+Shift+4`: focus or create ChatGPT as a pinned tab.
-- Shortcuts 5-9: assign shortcuts manually in Chrome's extension shortcuts page.
-- Floating window shortcut: assign it manually in Chrome's extension shortcuts page, or use the AutoHotkey companion.
+- Shortcuts 5-10: assign shortcuts manually in Chrome's extension shortcuts page.
+- Toolbar command palette: search and launch unlimited extra workspace entries without adding more slot shortcuts.
 
 When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
 
@@ -35,7 +35,9 @@ When a service tab already exists, the extension focuses its window, activates t
 4. Select the `browser-workspace-manager` folder.
 5. Open `chrome://extensions/shortcuts` and confirm the keyboard shortcuts.
 
-Chrome allows many extension commands, but only four commands may include default suggested shortcuts in `manifest.json`. This extension ships defaults for slots 1-4. To enable slots 5-9 and the floating window command, open `chrome://extensions/shortcuts`, find Keyboard Workspace Manager, and assign keys to `Focus Shortcut 5` through `Focus Shortcut 9` and `Open Floating Window`.
+Chrome allows many extension commands, but only four commands may include default suggested shortcuts in `manifest.json`. This extension ships defaults for slots 1-4. To enable slots 5-10, open `chrome://extensions/shortcuts`, find Keyboard Workspace Manager, and assign keys to `Focus Shortcut 5` through `Focus Shortcut 10`.
+
+The toolbar command palette can also be assigned manually from the same page using `Open Command Palette`. Chrome 127 or newer is required for extensions to open their own action popup from a command. Set this shortcut to `Global`; Chrome may not dispatch browser-scoped action-popup commands consistently. The command focuses a normal Chrome window before opening the popup because Chrome action popups are attached to browser toolbar windows.
 
 Chrome does not allow extension command shortcuts that include `Ctrl+Alt`, because that can conflict with AltGr keyboards. This is why `Ctrl+Alt+Shift+1` cannot be used directly in `manifest.json`. If you want Logitech Options+ buttons or AutoHotkey to use `Ctrl+Alt+Shift` muscle memory, bind those tools to send the Chrome-valid shortcut instead, such as `Ctrl+Shift+1`.
 
@@ -43,7 +45,7 @@ Chrome may also refuse a shortcut if another extension, Windows, the browser, Lo
 
 ## Configuration
 
-Open the extension options page from `chrome://extensions`. You can toggle debug logging, adjust pinned order healing, configure shortcut slots 1-9, and tune the ChatGPT popup panel size and position.
+Open the extension options page from `chrome://extensions`. You can toggle debug logging, adjust pinned order healing, configure shortcut slots 1-10, and tune any slot that opens as a floating window.
 
 Each numbered shortcut slot has:
 
@@ -57,11 +59,21 @@ Blank URLs are treated as disabled slots. Disabled slots do nothing when their c
 
 Pinned tab ordering is compressed across enabled pinned-tab slots only. For example, if slot 3 is configured as a floating window, then slot 4 becomes the third managed pinned tab rather than leaving an empty gap in the pinned tab strip.
 
-Chrome does not let extensions change command names dynamically in `chrome://extensions/shortcuts`, so that page shows generic names such as `Focus Shortcut 1`. The extension options page is the source of truth for your real slot names, such as `Gmail`, `Linear`, `Notion`, or `Banking`.
+Chrome does not let extensions change command names dynamically in `chrome://extensions/shortcuts`, so that page shows generic names such as `Focus Shortcut 1`. The extension options page is the source of truth for your real slot names, such as `Gmail`, `Linear`, `Notion`, or `Banking`. The manifest command ids are `focus-slot-01` through `focus-slot-10` so Chrome sorts them in slot order.
 
 Configuring a slot in the options page does not automatically create its Chrome keyboard shortcut. Chrome keeps shortcut assignment in `chrome://extensions/shortcuts`, so use the options page to define what each slot opens and Chrome's shortcuts page to define which key triggers it.
 
+The options page includes a `Chrome shortcuts` button. Chrome may block direct navigation to internal `chrome://` pages from extension pages; when that happens, the extension copies `chrome://extensions/shortcuts` so you can paste it into the address bar.
+
 Use `Export` and `Import` on the options page to back up or move your settings. Use each slot's reset button to restore one slot, or `Reset Defaults` to restore the full configuration.
+
+## Launcher Entries
+
+Keyboard slots are fixed because Chrome extension commands must be declared ahead of time in `manifest.json`. For anything beyond slots 1-10, use Launcher Entries.
+
+Launcher Entries are unlimited, configurable workspaces available from the extension toolbar command palette. They can open as regular tabs or floating popup windows, and they are searchable by name, URL, and tags. They do not need Chrome keyboard shortcut assignments.
+
+In the toolbar popup, Launcher Entries appear above Keyboard Slots by default. Type to filter entries and press Enter to launch the first visible match. If multiple entries match, click the exact entry you want.
 
 For deeper changes, edit `src/config.js`. Each service rule supports:
 
@@ -78,7 +90,7 @@ For deeper changes, edit `src/config.js`. Each service rule supports:
 ## Permissions
 
 - `tabs`: required to search, activate, pin, and move tabs.
-- `windows`: required to focus Chrome windows and create the popup panel.
+- `windows`: required to focus Chrome windows and create popup windows.
 - `storage`: required for the options page and future custom settings.
 
 The extension does not request website host permissions, inject content scripts, or read/change page contents. It reads tab URLs locally only so it can match a configured shortcut to an already-open tab.
@@ -87,9 +99,13 @@ The extension does not send data anywhere.
 
 See `PRIVACY.md` and `STORE_LISTING.md` for Web Store-ready privacy and permissions copy. The public privacy policy is available at https://github.com/codevibr/keyboard-workspace-manager/blob/main/PRIVACY.md.
 
+## License
+
+Keyboard Workspace Manager is released under the MIT License. See `LICENSE` for the full license text.
+
 ## Floating Window Strategy
 
-The extension uses `chrome.windows.create({ type: "popup" })` for floating-window shortcuts. This is the best built-in MV3 option for an app-like floating panel. It creates a popup-style Chrome window, reuses an existing matching popup if found, focuses it, and applies configured size/position.
+The extension uses `chrome.windows.create({ type: "popup" })` for slots or launcher entries configured as floating windows. This is the best built-in MV3 option for an app-like floating window. It creates a popup-style Chrome window, reuses an existing matching popup if found, focuses it, and applies configured size/position.
 
 Chrome extension limitations:
 
@@ -129,10 +145,11 @@ Logs include command received, tab found or missing, tab created, tab moved, and
 ## Troubleshooting
 
 - Shortcut does nothing: check `chrome://extensions/shortcuts`; Chrome may not have accepted the suggested shortcut.
-- Slots 5-9 or floating window do nothing: assign those commands manually in `chrome://extensions/shortcuts`.
+- Slots 5-10 do nothing: assign those commands manually in `chrome://extensions/shortcuts`.
+- Command palette shortcut only works when set to Global: this appears to be a Chrome command dispatch quirk for `chrome.action.openPopup()`. If Chrome does not dispatch a Chrome-only command, the extension never receives the shortcut event. Set `Open Command Palette` to Global. If the active window is not a normal Chrome browser window, the extension focuses a normal Chrome window before opening the palette.
 - Wrong tab opens: update the service `match.hosts` and `match.pathPrefixes`.
 - A shortcut opens `example.com`: set the real name and URL for that slot in extension options.
-- ChatGPT panel appears on the wrong monitor: adjust `left` and `top` in options, or use the AutoHotkey companion.
+- Floating window appears on the wrong monitor: adjust `left` and `top` in options, or use the AutoHotkey companion.
 - Extension stops responding briefly: MV3 service workers sleep by design. The commands API wakes the worker when a shortcut is pressed.
 
 ## Future Enhancements

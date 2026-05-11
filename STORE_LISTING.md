@@ -16,12 +16,14 @@ Configure shortcut slots for the web apps, dashboards, inboxes, tools, and assis
 
 Features:
 
-- Configurable shortcut slots 1-9.
+- Configurable shortcut slots 1-10.
 - Focus existing matching tabs across Chrome windows.
 - Create missing tabs automatically.
 - Keep managed tabs pinned and ordered.
 - Open configured shortcuts as floating popup windows.
-- Ships default shortcuts for slots 1-4; slots 5-9 and the floating window command are enabled by assigning shortcuts in Chrome's Extensions shortcuts page.
+- Ships default shortcuts for slots 1-4; slots 5-10 are enabled by assigning shortcuts in Chrome's Extensions shortcuts page.
+- Toolbar command palette with unlimited searchable launcher entries for workspaces that do not need dedicated keyboard shortcuts.
+- Launcher Entries appear above Keyboard Slots in the toolbar popup, and pressing Enter launches the first visible search result.
 - Configure names, URLs, launch mode, and window geometry.
 - Export and import settings as JSON.
 - Reset individual slots or restore defaults.
@@ -36,6 +38,10 @@ Public privacy policy:
 
 https://github.com/codevibr/keyboard-workspace-manager/blob/main/PRIVACY.md
 
+License:
+
+Keyboard Workspace Manager is released under the MIT License.
+
 ## Category
 
 Productivity
@@ -44,7 +50,11 @@ Productivity
 
 Keyboard Workspace Manager lets users configure keyboard shortcuts that focus, create, pin, order, and launch browser workspace tabs or popup windows.
 
-Chrome manages extension shortcut assignment separately from extension options. Keyboard Workspace Manager provides default shortcuts for slots 1-4. Users enable slots 5-9 and the floating window command by visiting `chrome://extensions/shortcuts` and assigning keys to those commands.
+Chrome manages extension shortcut assignment separately from extension options. Keyboard Workspace Manager provides default shortcuts for slots 1-4. Users enable slots 5-10 by visiting `chrome://extensions/shortcuts` and assigning keys to those commands.
+
+For additional workspaces beyond the manifest-backed shortcut slots, users can create unlimited Launcher Entries and open them from the extension toolbar popup.
+
+Users on Chrome 127 or newer can assign the `Open Command Palette` extension command to open the toolbar popup from the keyboard. That command should be set to Global because Chrome may not consistently dispatch browser-scoped action-popup shortcuts.
 
 ## Permissions Justification
 
@@ -65,6 +75,10 @@ Required to save user configuration, including shortcut names, URLs, enabled sta
 ## Privacy Disclosure Draft
 
 This extension does not collect or transmit user data. It does not request website host permissions and does not read or change page contents. It processes tab URLs locally only to match configured shortcuts to existing browser tabs. User settings are stored in Chrome extension storage and may sync through Chrome if the user has Chrome Sync enabled.
+
+## License Disclosure Draft
+
+Keyboard Workspace Manager is open source software released under the MIT License.
 
 ## Screenshot Ideas
 

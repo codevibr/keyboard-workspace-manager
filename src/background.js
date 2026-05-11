@@ -1,7 +1,7 @@
 import { routeCommand } from "./commandRouter.js";
 import { setDebug, log, warn } from "./logger.js";
 import { getSettings } from "./storage.js";
-import { healPinnedServices } from "./tabManager.js";
+import { focusOrCreateService, healPinnedServices } from "./tabManager.js";
 
 chrome.runtime.onInstalled.addListener(async () => {
   const settings = await getSettings();
@@ -19,6 +19,11 @@ chrome.runtime.onStartup.addListener(async () => {
 
 chrome.commands.onCommand.addListener((command) => {
   runSafely(async () => {
+    if (command === "open-command-palette") {
+      await openCommandPalette();
+      return;
+    }
+
     const settings = await getSettings();
     setDebug(settings.debug);
     await routeCommand(command, settings);
@@ -27,18 +32,37 @@ chrome.commands.onCommand.addListener((command) => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type !== "workspace-manager:update-settings") {
-    return false;
+  if (message?.type === "workspace-manager:update-settings") {
+    runSafely(async () => {
+      const settings = await getSettings();
+      setDebug(settings.debug);
+      await updateBadge(settings);
+      sendResponse({ ok: true });
+    });
+
+    return true;
   }
 
-  runSafely(async () => {
-    const settings = await getSettings();
-    setDebug(settings.debug);
-    await updateBadge(settings);
-    sendResponse({ ok: true });
-  });
+  if (message?.type === "workspace-manager:launch-entry") {
+    runSafely(async () => {
+      const settings = await getSettings();
+      setDebug(settings.debug);
+      const entry = [...(settings.launcherEntries || []), ...Object.values(settings.services || {})]
+        .find((candidate) => candidate.id === message.entryId);
 
-  return true;
+      if (!entry?.enabled || !entry.url) {
+        sendResponse({ ok: false, error: "Entry is disabled or missing a URL." });
+        return;
+      }
+
+      await focusOrCreateService(entry, settings);
+      sendResponse({ ok: true });
+    });
+
+    return true;
+  }
+
+  return false;
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -58,6 +82,34 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 async function updateBadge(settings) {
   await chrome.action.setBadgeText({ text: "" });
   await chrome.action.setBadgeBackgroundColor({ color: "#2563eb" });
+}
+
+async function openCommandPalette() {
+  if (!chrome.action?.openPopup) {
+    warn("Command palette popup is not available in this Chrome version");
+    return;
+  }
+
+  const targetWindow = await getCommandPaletteWindow();
+  if (!targetWindow?.id) {
+    warn("No normal Chrome window is available for the command palette popup");
+    return;
+  }
+
+  await chrome.windows.update(targetWindow.id, { focused: true });
+  await chrome.action.openPopup({ windowId: targetWindow.id });
+  log("Command palette action popup opened", { windowId: targetWindow.id });
+}
+
+async function getCommandPaletteWindow() {
+  const windows = await chrome.windows.getAll({ windowTypes: ["normal"] });
+  const focused = windows.find((candidate) => candidate.focused);
+  if (focused) {
+    return focused;
+  }
+
+  const [firstNormalWindow] = windows;
+  return firstNormalWindow || null;
 }
 
 function runSafely(task) {
