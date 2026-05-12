@@ -23,6 +23,10 @@ When a service tab already exists, the extension focuses its window, activates t
 
 ![Floating window shortcut](store-assets/screenshot-command-palette-v092.png)
 
+### Command Palette - Launcher Options
+
+![Floating window shortcut](store-assets/screenshot-command-palette-launcher-options-v092.png)
+
 ### Floating Window
 
 ![Floating window shortcut](store-assets/screenshot-floating-window-v092.png)
