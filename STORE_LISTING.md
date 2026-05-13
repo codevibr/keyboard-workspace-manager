@@ -25,6 +25,7 @@ Features:
 - Toolbar command palette with unlimited searchable launcher entries for workspaces that do not need dedicated keyboard shortcuts.
 - Launcher Entries, Keyboard Slots, and matching open tabs appear in one command palette result list.
 - Optional bookmark search in the command palette, disabled by default and enabled only after the user grants bookmark permission.
+- Light, dark, or system-following theme for both the options page and command palette.
 - Configure names, URLs, launch mode, and window geometry.
 - Export and import settings as JSON.
 - Reset individual slots or restore defaults.

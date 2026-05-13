@@ -2,6 +2,13 @@
 
 All notable changes to Keyboard Workspace Manager will be documented in this file.
 
+## 0.10.1 - Theme Preferences
+
+### Added
+
+- Appearance setting for Light, Dark, or Follow system theme.
+- Matching light/dark theme behavior for both the options page and command palette.
+
 ## 0.10.0 - Optional Bookmark Search
 
 ### Added

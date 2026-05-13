@@ -4,6 +4,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   debug: false,
   healPinnedOrderOnStartup: true,
   includeBookmarksInCommandPalette: false,
+  themeMode: "light",
   launcherEntries: [
     {
       id: "launcher-linear",

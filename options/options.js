@@ -1,9 +1,11 @@
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from "../src/config.js";
 import { getSettings, saveSettings } from "../src/storage.js";
+import { applyTheme, watchSystemTheme } from "../src/theme.js";
 
 const fields = {
   navItems: document.querySelectorAll("[data-view-tab]"),
   views: document.querySelectorAll("[data-view]"),
+  themeMode: document.querySelector("#themeMode"),
   debug: document.querySelector("#debug"),
   healPinnedOrderOnStartup: document.querySelector("#healPinnedOrderOnStartup"),
   includeBookmarksInCommandPalette: document.querySelector("#includeBookmarksInCommandPalette"),
@@ -20,14 +22,17 @@ const fields = {
 };
 
 let settings = await getSettings();
+applyTheme(settings);
 render(settings);
 await syncBookmarkPermissionState();
+watchSystemTheme(() => settings);
 
 for (const item of fields.navItems) {
   item.addEventListener("click", () => showView(item.dataset.viewTab));
 }
 
 fields.save.addEventListener("click", async () => {
+  settings.themeMode = fields.themeMode.value;
   settings.debug = fields.debug.checked;
   settings.healPinnedOrderOnStartup = fields.healPinnedOrderOnStartup.checked;
   settings.includeBookmarksInCommandPalette = await reconcileBookmarkPermission(
@@ -61,8 +66,14 @@ fields.save.addEventListener("click", async () => {
   settings.launcherEntries = readLauncherEntries();
 
   settings = await saveSettings(settings);
+  applyTheme(settings);
   chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
   showStatus("Saved.");
+});
+
+fields.themeMode.addEventListener("change", () => {
+  settings.themeMode = fields.themeMode.value;
+  applyTheme(settings);
 });
 
 for (const resetButton of fields.resetDefaults) {
@@ -120,6 +131,7 @@ fields.importFile.addEventListener("change", async () => {
   try {
     const imported = JSON.parse(await file.text());
     settings = await saveSettings(imported);
+    applyTheme(settings);
     render(settings);
     await syncBookmarkPermissionState();
     chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
@@ -158,6 +170,7 @@ async function resetToDefaults() {
   await reconcileBookmarkPermission(false, { requestIfNeeded: false });
   await chrome.storage.sync.remove(STORAGE_KEYS.settings);
   settings = await getSettings();
+  applyTheme(settings);
   render(settings);
   await syncBookmarkPermissionState();
   chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
@@ -212,6 +225,7 @@ function showView(viewName) {
 }
 
 function render(nextSettings) {
+  fields.themeMode.value = nextSettings.themeMode || "light";
   fields.debug.checked = nextSettings.debug;
   fields.healPinnedOrderOnStartup.checked = nextSettings.healPinnedOrderOnStartup;
   fields.includeBookmarksInCommandPalette.checked = Boolean(nextSettings.includeBookmarksInCommandPalette);

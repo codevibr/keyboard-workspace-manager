@@ -1,4 +1,5 @@
 import { getSettings } from "../src/storage.js";
+import { applyTheme, watchSystemTheme } from "../src/theme.js";
 
 const fields = {
   openOptions: document.querySelector("#openOptions"),
@@ -9,6 +10,8 @@ const fields = {
 };
 
 const settings = await getSettings();
+applyTheme(settings);
+watchSystemTheme(() => settings);
 let visibleEntries = [];
 let selectedIndex = 0;
 let renderVersion = 0;

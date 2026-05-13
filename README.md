@@ -11,6 +11,7 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 - Shortcuts 5-10: assign shortcuts manually in Chrome's extension shortcuts page.
 - Toolbar command palette: search and launch unlimited extra workspace entries without adding more slot shortcuts.
 - Optional bookmark search in the command palette, disabled by default.
+- Light, dark, or system-following theme for the options page and command palette.
 
 When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
 
@@ -50,7 +51,7 @@ Chrome may also refuse a shortcut if another extension, Windows, the browser, Lo
 
 ## Configuration
 
-Open the extension options page from `chrome://extensions`. You can toggle debug logging, adjust pinned order healing, optionally enable bookmark search, configure shortcut slots 1-10, and tune any slot that opens as a floating window.
+Open the extension options page from `chrome://extensions`. You can choose light mode, dark mode, or follow your Windows theme, toggle debug logging, adjust pinned order healing, optionally enable bookmark search, configure shortcut slots 1-10, and tune any slot that opens as a floating window.
 
 Each numbered shortcut slot has:
 
@@ -160,9 +161,8 @@ Logs include command received, tab found or missing, tab created, tab moved, and
 
 ## Future Enhancements
 
-- Workspace profiles with different pinned layouts.
-- URL aliases per service.
-- Cycling through multiple matching tabs.
-- Tab group creation and color assignment.
-- Startup restore that creates missing pinned tabs automatically.
-- Command palette opened from the extension action.
+- Startup restore that creates missing pinned tabs automatically when Chrome opens. This is a strong fit for the `0.10.x` series because it builds on the existing slot rules and helps recover from Chrome sessions that reopen without pinned tabs.
+- Cycling through multiple matching tabs for a slot. For example, pressing the same shortcut repeatedly could move through all matching Gmail or ChatGPT tabs instead of always choosing the highest-ranked match.
+- Workspace profiles with different pinned layouts. A profile could define a complete slot layout for a context like Work, Personal, Research, or Streaming, then switch several pinned tabs at once.
+- URL aliases per service. This would let one slot recognize multiple related URLs as the same workspace entry, such as `mail.google.com`, `inbox.google.com`, and a company SSO redirect for Gmail, without creating duplicate slots.
+- Tab group creation and color assignment. This is probably better as a later `1.x` feature because it adds a second layer of workspace organization on top of pinned tab position management.
