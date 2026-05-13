@@ -2,6 +2,15 @@
 
 All notable changes to Keyboard Workspace Manager will be documented in this file.
 
+## 0.9.3 - Public Testing Candidate
+
+### Added
+
+- Combined command palette results into one ranked list.
+- Added open-tab search by title and URL in the command palette.
+- Open-tab command palette results focus the existing tab and its Chrome window.
+- Popup-window tab results are labeled as floating windows in the command palette.
+
 ## 0.9.2 - Public Testing Candidate
 
 ### Added

@@ -23,7 +23,7 @@ Features:
 - Open configured shortcuts as floating popup windows.
 - Ships default shortcuts for slots 1-4; slots 5-10 are enabled by assigning shortcuts in Chrome's Extensions shortcuts page.
 - Toolbar command palette with unlimited searchable launcher entries for workspaces that do not need dedicated keyboard shortcuts.
-- Launcher Entries appear above Keyboard Slots in the toolbar popup, and pressing Enter launches the first visible search result.
+- Launcher Entries, Keyboard Slots, and matching open tabs appear in one command palette result list.
 - Configure names, URLs, launch mode, and window geometry.
 - Export and import settings as JSON.
 - Reset individual slots or restore defaults.

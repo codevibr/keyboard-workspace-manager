@@ -3,16 +3,15 @@ import { getSettings } from "../src/storage.js";
 const fields = {
   openOptions: document.querySelector("#openOptions"),
   query: document.querySelector("#query"),
-  keyboardSection: document.querySelector("#keyboardSection"),
-  keyboardSlots: document.querySelector("#keyboardSlots"),
-  launcherSection: document.querySelector("#launcherSection"),
-  launcherEntries: document.querySelector("#launcherEntries"),
+  resultsSection: document.querySelector("#resultsSection"),
+  results: document.querySelector("#results"),
   emptyState: document.querySelector("#emptyState")
 };
 
 const settings = await getSettings();
 let visibleEntries = [];
 let selectedIndex = 0;
+let renderVersion = 0;
 
 fields.openOptions.addEventListener("click", () => {
   chrome.runtime.openOptionsPage();
@@ -22,6 +21,7 @@ fields.query.addEventListener("input", () => {
   selectedIndex = 0;
   render();
 });
+
 fields.query.addEventListener("keydown", async (event) => {
   if (visibleEntries.length === 0) {
     return;
@@ -50,31 +50,79 @@ fields.query.addEventListener("keydown", async (event) => {
 render();
 fields.query.focus();
 
-function render() {
+async function render() {
+  const version = ++renderVersion;
   const query = fields.query.value.trim().toLowerCase();
-  const keyboardEntries = Object.values(settings.services || {})
+  const entries = [
+    ...launcherEntries(query),
+    ...keyboardEntries(query),
+    ...(await openTabEntries(query))
+  ];
+
+  if (version !== renderVersion) {
+    return;
+  }
+
+  visibleEntries = entries;
+  selectedIndex = Math.min(selectedIndex, Math.max(visibleEntries.length - 1, 0));
+  renderEntries(fields.results, visibleEntries);
+  updateSelectedEntry();
+
+  fields.resultsSection.hidden = visibleEntries.length === 0;
+  fields.emptyState.hidden = visibleEntries.length > 0;
+}
+
+function launcherEntries(query) {
+  return (settings.launcherEntries || [])
+    .filter((entry) => entry.enabled && entry.url)
+    .map((entry) => ({
+      ...entry,
+      entryType: "configured",
+      label: "Launcher",
+      tags: ["launcher", ...(entry.tags || [])]
+    }))
+    .filter((entry) => matchesQuery(entry, query));
+}
+
+function keyboardEntries(query) {
+  return Object.values(settings.services || {})
     .filter((service) => service.slot && service.enabled && service.url)
     .sort((a, b) => a.slot - b.slot)
     .map((service) => ({
       ...service,
+      entryType: "configured",
       label: `Slot ${service.slot}`,
       tags: [`slot ${service.slot}`]
     }))
     .filter((entry) => matchesQuery(entry, query));
+}
 
-  const launcherEntries = (settings.launcherEntries || [])
-    .filter((entry) => entry.enabled && entry.url)
-    .filter((entry) => matchesQuery(entry, query));
+async function openTabEntries(query) {
+  if (!query) {
+    return [];
+  }
 
-  visibleEntries = [...launcherEntries, ...keyboardEntries];
-  selectedIndex = Math.min(selectedIndex, Math.max(visibleEntries.length - 1, 0));
-  renderEntries(fields.keyboardSlots, keyboardEntries);
-  renderEntries(fields.launcherEntries, launcherEntries);
-  updateSelectedEntry();
+  const tabs = await chrome.tabs.query({});
+  const windows = await chrome.windows.getAll();
+  const windowsById = new Map(windows.map((window) => [window.id, window]));
 
-  fields.keyboardSection.hidden = keyboardEntries.length === 0;
-  fields.launcherSection.hidden = launcherEntries.length === 0;
-  fields.emptyState.hidden = keyboardEntries.length + launcherEntries.length > 0;
+  return tabs
+    .filter((tab) => tab.url && matchesOpenTab(tab, query))
+    .map((tab) => {
+      const window = windowsById.get(tab.windowId);
+      const isPopupWindow = window?.type === "popup";
+
+      return {
+        id: `open-tab-${tab.id}`,
+        entryType: "openTab",
+        tabId: tab.id,
+        windowId: tab.windowId,
+        name: tab.title || tab.url,
+        url: tab.url,
+        label: isPopupWindow ? "Floating window" : "Open tab",
+        tags: [isPopupWindow ? "floating window" : "open tab"]
+      };
+    });
 }
 
 function renderEntries(container, entries) {
@@ -97,7 +145,7 @@ function renderEntries(container, entries) {
     `;
 
     row.querySelector(".entry-name").textContent = entry.name || "Untitled";
-    row.querySelector(".mode").textContent = entry.launchMode === "popupWindow" ? "Window" : "Tab";
+    row.querySelector(".mode").textContent = modeLabel(entry);
     row.querySelector(".entry-url").textContent = entry.url;
 
     const tags = row.querySelector(".entry-tags");
@@ -109,7 +157,6 @@ function renderEntries(container, entries) {
     }
 
     row.addEventListener("click", () => launchEntry(entry));
-
     container.append(row);
   }
 }
@@ -138,6 +185,13 @@ function updateSelectedEntry() {
 }
 
 async function launchEntry(entry) {
+  if (entry.entryType === "openTab") {
+    await chrome.windows.update(entry.windowId, { focused: true });
+    await chrome.tabs.update(entry.tabId, { active: true });
+    window.close();
+    return;
+  }
+
   await chrome.runtime.sendMessage({
     type: "workspace-manager:launch-entry",
     entryId: entry.id
@@ -156,4 +210,17 @@ function matchesQuery(entry, query) {
     entry.label,
     ...(entry.tags || [])
   ].some((value) => String(value || "").toLowerCase().includes(query));
+}
+
+function matchesOpenTab(tab, query) {
+  return [tab.title, tab.url]
+    .some((value) => String(value || "").toLowerCase().includes(query));
+}
+
+function modeLabel(entry) {
+  if (entry.entryType === "openTab") {
+    return "Open tab";
+  }
+
+  return entry.launchMode === "popupWindow" ? "Window" : "Tab";
 }

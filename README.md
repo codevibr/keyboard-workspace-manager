@@ -77,7 +77,7 @@ Keyboard slots are fixed because Chrome extension commands must be declared ahea
 
 Launcher Entries are unlimited, configurable workspaces available from the extension toolbar command palette. They can open as regular tabs or floating popup windows, and they are searchable by name, URL, and tags. They do not need Chrome keyboard shortcut assignments.
 
-In the toolbar popup, Launcher Entries appear above Keyboard Slots by default. Type to filter entries and press Enter to launch the first visible match. If multiple entries match, click the exact entry you want.
+In the toolbar popup, Launcher Entries and Keyboard Slots appear in one result list, with Launcher Entries ranked first. Type to filter entries and press Enter to launch the highlighted match. Open Chrome tabs also appear when they match the typed title or URL text.
 
 For deeper changes, edit `src/config.js`. Each service rule supports:
 
