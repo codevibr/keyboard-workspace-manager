@@ -10,6 +10,7 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 - `Ctrl+Shift+4`: focus or create ChatGPT as a pinned tab.
 - Shortcuts 5-10: assign shortcuts manually in Chrome's extension shortcuts page.
 - Toolbar command palette: search and launch unlimited extra workspace entries without adding more slot shortcuts.
+- Optional bookmark search in the command palette, disabled by default.
 
 When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
 
@@ -49,7 +50,7 @@ Chrome may also refuse a shortcut if another extension, Windows, the browser, Lo
 
 ## Configuration
 
-Open the extension options page from `chrome://extensions`. You can toggle debug logging, adjust pinned order healing, configure shortcut slots 1-10, and tune any slot that opens as a floating window.
+Open the extension options page from `chrome://extensions`. You can toggle debug logging, adjust pinned order healing, optionally enable bookmark search, configure shortcut slots 1-10, and tune any slot that opens as a floating window.
 
 Each numbered shortcut slot has:
 
@@ -77,7 +78,7 @@ Keyboard slots are fixed because Chrome extension commands must be declared ahea
 
 Launcher Entries are unlimited, configurable workspaces available from the extension toolbar command palette. They can open as regular tabs or floating popup windows, and they are searchable by name, URL, and tags. They do not need Chrome keyboard shortcut assignments.
 
-In the toolbar popup, Launcher Entries and Keyboard Slots appear in one result list, with Launcher Entries ranked first. Type to filter entries and press Enter to launch the highlighted match. Open Chrome tabs also appear when they match the typed title or URL text.
+In the toolbar popup, Launcher Entries and Keyboard Slots appear in one result list, with Launcher Entries ranked first. Type to filter entries and press Enter to launch the highlighted match. Open Chrome tabs also appear when they match the typed title or URL text. If bookmark search is enabled in Settings, matching bookmarks appear after open tabs and open in a new tab.
 
 For deeper changes, edit `src/config.js`. Each service rule supports:
 
@@ -96,8 +97,9 @@ For deeper changes, edit `src/config.js`. Each service rule supports:
 - `tabs`: required to search, activate, pin, and move tabs.
 - `windows`: required to focus Chrome windows and create popup windows.
 - `storage`: required for the options page and future custom settings.
+- Optional `bookmarks`: requested only if you enable bookmark search in Settings. It is used locally to search bookmark titles and URLs from the command palette.
 
-The extension does not request website host permissions, inject content scripts, or read/change page contents. It reads tab URLs locally only so it can match a configured shortcut to an already-open tab.
+The extension does not request website host permissions, inject content scripts, or read/change page contents. It reads tab URLs locally only so it can match a configured shortcut to an already-open tab. If optional bookmark search is enabled, bookmark titles and URLs are searched locally and are not transmitted. Disabling bookmark search removes active bookmark access. Chrome may remember that you previously approved the optional permission, so re-enabling bookmark search may not show the permission prompt again.
 
 The extension does not send data anywhere.
 

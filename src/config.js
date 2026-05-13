@@ -3,6 +3,7 @@ export const CONFIG_VERSION = 1;
 export const DEFAULT_SETTINGS = Object.freeze({
   debug: false,
   healPinnedOrderOnStartup: true,
+  includeBookmarksInCommandPalette: false,
   launcherEntries: [
     {
       id: "launcher-linear",

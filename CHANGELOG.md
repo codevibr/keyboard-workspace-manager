@@ -2,6 +2,16 @@
 
 All notable changes to Keyboard Workspace Manager will be documented in this file.
 
+## 0.10.0 - Optional Bookmark Search
+
+### Added
+
+- Optional command palette bookmark search, disabled by default.
+- Optional `bookmarks` permission requested only when bookmark search is enabled in Settings.
+- Disabling bookmark search removes active bookmark access; docs clarify that Chrome may remember prior approval and skip the prompt if re-enabled.
+- Bookmark command palette results that match typed bookmark title or URL text and open in a new tab.
+- README, Store listing, and Privacy Policy disclosures for optional bookmark access.
+
 ## 0.9.3 - Public Testing Candidate
 
 ### Added

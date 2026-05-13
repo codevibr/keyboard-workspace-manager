@@ -56,7 +56,8 @@ async function render() {
   const entries = [
     ...launcherEntries(query),
     ...keyboardEntries(query),
-    ...(await openTabEntries(query))
+    ...(await openTabEntries(query)),
+    ...(await bookmarkEntries(query))
   ];
 
   if (version !== renderVersion) {
@@ -125,6 +126,31 @@ async function openTabEntries(query) {
     });
 }
 
+async function bookmarkEntries(query) {
+  if (!query || !settings.includeBookmarksInCommandPalette) {
+    return [];
+  }
+
+  const hasPermission = await chrome.permissions.contains({ permissions: ["bookmarks"] });
+  if (!hasPermission || !chrome.bookmarks?.search) {
+    return [];
+  }
+
+  const bookmarks = await chrome.bookmarks.search(query);
+  return bookmarks
+    .filter((bookmark) => bookmark.url && matchesBookmark(bookmark, query))
+    .slice(0, 20)
+    .map((bookmark) => ({
+      id: `bookmark-${bookmark.id}`,
+      entryType: "bookmark",
+      name: bookmark.title || bookmark.url,
+      url: bookmark.url,
+      label: "Bookmark",
+      tags: ["bookmark"]
+    }));
+}
+
+
 function renderEntries(container, entries) {
   container.textContent = "";
 
@@ -185,6 +211,12 @@ function updateSelectedEntry() {
 }
 
 async function launchEntry(entry) {
+  if (entry.entryType === "bookmark") {
+    await chrome.tabs.create({ url: entry.url, active: true });
+    window.close();
+    return;
+  }
+
   if (entry.entryType === "openTab") {
     await chrome.windows.update(entry.windowId, { focused: true });
     await chrome.tabs.update(entry.tabId, { active: true });
@@ -217,7 +249,16 @@ function matchesOpenTab(tab, query) {
     .some((value) => String(value || "").toLowerCase().includes(query));
 }
 
+function matchesBookmark(bookmark, query) {
+  return [bookmark.title, bookmark.url]
+    .some((value) => String(value || "").toLowerCase().includes(query));
+}
+
 function modeLabel(entry) {
+  if (entry.entryType === "bookmark") {
+    return "Bookmark";
+  }
+
   if (entry.entryType === "openTab") {
     return "Open tab";
   }

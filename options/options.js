@@ -6,6 +6,7 @@ const fields = {
   views: document.querySelectorAll("[data-view]"),
   debug: document.querySelector("#debug"),
   healPinnedOrderOnStartup: document.querySelector("#healPinnedOrderOnStartup"),
+  includeBookmarksInCommandPalette: document.querySelector("#includeBookmarksInCommandPalette"),
   slots: document.querySelector("#slots"),
   launcherEntries: document.querySelector("#launcherEntries"),
   addLauncherEntry: document.querySelector("#addLauncherEntry"),
@@ -20,6 +21,7 @@ const fields = {
 
 let settings = await getSettings();
 render(settings);
+await syncBookmarkPermissionState();
 
 for (const item of fields.navItems) {
   item.addEventListener("click", () => showView(item.dataset.viewTab));
@@ -28,6 +30,10 @@ for (const item of fields.navItems) {
 fields.save.addEventListener("click", async () => {
   settings.debug = fields.debug.checked;
   settings.healPinnedOrderOnStartup = fields.healPinnedOrderOnStartup.checked;
+  settings.includeBookmarksInCommandPalette = await reconcileBookmarkPermission(
+    fields.includeBookmarksInCommandPalette.checked,
+    { requestIfNeeded: true }
+  );
 
   for (let slot = 1; slot <= 10; slot += 1) {
     const service = settings.services[`slot${slot}`];
@@ -79,6 +85,32 @@ fields.importSettings.addEventListener("click", () => {
   fields.importFile.click();
 });
 
+fields.includeBookmarksInCommandPalette.addEventListener("change", async () => {
+  const requested = fields.includeBookmarksInCommandPalette.checked;
+  const enabled = await reconcileBookmarkPermission(
+    requested,
+    { requestIfNeeded: true }
+  );
+  fields.includeBookmarksInCommandPalette.checked = enabled;
+
+  if (enabled) {
+    showStatus("Bookmark search enabled. Save to keep it.");
+    return;
+  }
+
+  if (requested) {
+    showStatus("Bookmark permission was not granted.");
+    return;
+  }
+
+  const hasPermission = await chrome.permissions.contains({ permissions: ["bookmarks"] });
+  showStatus(
+    hasPermission
+      ? "Chrome kept bookmark permission. Remove it in extension details."
+      : "Bookmark search disabled and permission removed. Save to keep it."
+  );
+});
+
 fields.importFile.addEventListener("change", async () => {
   const file = fields.importFile.files[0];
   if (!file) {
@@ -89,6 +121,7 @@ fields.importFile.addEventListener("change", async () => {
     const imported = JSON.parse(await file.text());
     settings = await saveSettings(imported);
     render(settings);
+    await syncBookmarkPermissionState();
     chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
     showStatus("Imported settings.");
   } catch {
@@ -122,11 +155,48 @@ fields.openChromeShortcuts.addEventListener("click", async () => {
 });
 
 async function resetToDefaults() {
+  await reconcileBookmarkPermission(false, { requestIfNeeded: false });
   await chrome.storage.sync.remove(STORAGE_KEYS.settings);
   settings = await getSettings();
   render(settings);
+  await syncBookmarkPermissionState();
   chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
   showStatus("Defaults restored.");
+}
+
+async function syncBookmarkPermissionState() {
+  const hasPermission = await chrome.permissions.contains({ permissions: ["bookmarks"] });
+  fields.includeBookmarksInCommandPalette.checked = Boolean(
+    settings.includeBookmarksInCommandPalette && hasPermission
+  );
+
+  if (settings.includeBookmarksInCommandPalette && !hasPermission) {
+    settings.includeBookmarksInCommandPalette = false;
+    settings = await saveSettings(settings);
+  }
+}
+
+async function reconcileBookmarkPermission(enabled, { requestIfNeeded }) {
+  if (enabled) {
+    const hasPermission = await chrome.permissions.contains({ permissions: ["bookmarks"] });
+    if (hasPermission) {
+      return true;
+    }
+
+    if (!requestIfNeeded) {
+      return false;
+    }
+
+    return chrome.permissions.request({ permissions: ["bookmarks"] });
+  }
+
+  const hadPermission = await chrome.permissions.contains({ permissions: ["bookmarks"] });
+  if (hadPermission) {
+    await chrome.permissions.remove({ permissions: ["bookmarks"] });
+  }
+
+  const stillHasPermission = await chrome.permissions.contains({ permissions: ["bookmarks"] });
+  return false;
 }
 
 function showView(viewName) {
@@ -144,6 +214,7 @@ function showView(viewName) {
 function render(nextSettings) {
   fields.debug.checked = nextSettings.debug;
   fields.healPinnedOrderOnStartup.checked = nextSettings.healPinnedOrderOnStartup;
+  fields.includeBookmarksInCommandPalette.checked = Boolean(nextSettings.includeBookmarksInCommandPalette);
   renderSlots(nextSettings);
   renderLauncherEntries(nextSettings);
 }

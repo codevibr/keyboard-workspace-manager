@@ -24,6 +24,7 @@ Features:
 - Ships default shortcuts for slots 1-4; slots 5-10 are enabled by assigning shortcuts in Chrome's Extensions shortcuts page.
 - Toolbar command palette with unlimited searchable launcher entries for workspaces that do not need dedicated keyboard shortcuts.
 - Launcher Entries, Keyboard Slots, and matching open tabs appear in one command palette result list.
+- Optional bookmark search in the command palette, disabled by default and enabled only after the user grants bookmark permission.
 - Configure names, URLs, launch mode, and window geometry.
 - Export and import settings as JSON.
 - Reset individual slots or restore defaults.
@@ -72,9 +73,13 @@ Required to focus the Chrome window containing a matched tab and to create or fo
 
 Required to save user configuration, including shortcut names, URLs, enabled state, launch mode, window geometry, debug setting, and import/export state.
 
+### Optional `bookmarks`
+
+Requested only if the user enables bookmark search in Settings. Used to search bookmark titles and URLs locally from the command palette and open selected bookmarks in a new tab. Disabling bookmark search removes active bookmark access. Chrome may remember prior approval, so re-enabling the feature may not show the permission prompt again.
+
 ## Privacy Disclosure Draft
 
-This extension does not collect or transmit user data. It does not request website host permissions and does not read or change page contents. It processes tab URLs locally only to match configured shortcuts to existing browser tabs. User settings are stored in Chrome extension storage and may sync through Chrome if the user has Chrome Sync enabled.
+This extension does not collect or transmit user data. It does not request website host permissions and does not read or change page contents. It processes tab URLs locally only to match configured shortcuts to existing browser tabs. Optional bookmark search, if enabled by the user, processes bookmark titles and URLs locally for command palette search. Disabling bookmark search removes active bookmark access, though Chrome may remember prior approval for future re-enabling. User settings are stored in Chrome extension storage and may sync through Chrome if the user has Chrome Sync enabled.
 
 ## License Disclosure Draft
 
