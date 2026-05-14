@@ -56,10 +56,11 @@ fields.query.focus();
 async function render() {
   const version = ++renderVersion;
   const query = fields.query.value.trim().toLowerCase();
+  const tabs = await chrome.tabs.query({});
   const entries = [
-    ...launcherEntries(query),
-    ...keyboardEntries(query),
-    ...(await openTabEntries(query)),
+    ...launcherEntries(query, tabs),
+    ...keyboardEntries(query, tabs),
+    ...(await openTabEntries(query, tabs)),
     ...(await bookmarkEntries(query))
   ];
 
@@ -76,37 +77,38 @@ async function render() {
   fields.emptyState.hidden = visibleEntries.length > 0;
 }
 
-function launcherEntries(query) {
+function launcherEntries(query, tabs) {
   return (settings.launcherEntries || [])
     .filter((entry) => entry.enabled && entry.url)
     .map((entry) => ({
       ...entry,
       entryType: "configured",
+      favIconUrl: faviconForConfiguredEntry(entry, tabs),
       label: "Launcher",
       tags: ["launcher", ...(entry.tags || [])]
     }))
     .filter((entry) => matchesQuery(entry, query));
 }
 
-function keyboardEntries(query) {
+function keyboardEntries(query, tabs) {
   return Object.values(settings.services || {})
     .filter((service) => service.slot && service.enabled && service.url)
     .sort((a, b) => a.slot - b.slot)
     .map((service) => ({
       ...service,
       entryType: "configured",
+      favIconUrl: faviconForConfiguredEntry(service, tabs),
       label: `Slot ${service.slot}`,
       tags: [`slot ${service.slot}`]
     }))
     .filter((entry) => matchesQuery(entry, query));
 }
 
-async function openTabEntries(query) {
+async function openTabEntries(query, tabs) {
   if (!query) {
     return [];
   }
 
-  const tabs = await chrome.tabs.query({});
   const windows = await chrome.windows.getAll();
   const windowsById = new Map(windows.map((window) => [window.id, window]));
 
@@ -123,6 +125,7 @@ async function openTabEntries(query) {
         windowId: tab.windowId,
         name: tab.title || tab.url,
         url: tab.url,
+        favIconUrl: tab.favIconUrl || "",
         label: isPopupWindow ? "Floating window" : "Open tab",
         tags: [isPopupWindow ? "floating window" : "open tab"]
       };
@@ -163,18 +166,22 @@ function renderEntries(container, entries) {
     row.type = "button";
     row.dataset.entryId = entry.id;
     row.innerHTML = `
-      <div>
+      <span class="entry-icon" aria-hidden="true"></span>
+      <div class="entry-content">
         <div class="entry-title">
           <span class="entry-name"></span>
           <span class="mode"></span>
         </div>
+        <div class="entry-meta"></div>
         <div class="entry-url"></div>
         <div class="entry-tags"></div>
       </div>
     `;
 
+    renderEntryIcon(row.querySelector(".entry-icon"), entry);
     row.querySelector(".entry-name").textContent = entry.name || "Untitled";
     row.querySelector(".mode").textContent = modeLabel(entry);
+    row.querySelector(".entry-meta").textContent = entrySubtitle(entry);
     row.querySelector(".entry-url").textContent = entry.url;
 
     const tags = row.querySelector(".entry-tags");
@@ -263,8 +270,83 @@ function modeLabel(entry) {
   }
 
   if (entry.entryType === "openTab") {
-    return "Open tab";
+    return entry.label;
   }
 
   return entry.launchMode === "popupWindow" ? "Window" : "Tab";
+}
+
+function renderEntryIcon(container, entry) {
+  container.textContent = "";
+
+  if (entry.favIconUrl) {
+    const image = document.createElement("img");
+    image.alt = "";
+    image.src = entry.favIconUrl;
+    image.addEventListener("error", () => {
+      image.remove();
+      container.innerHTML = iconForEntry(entry);
+    }, { once: true });
+    container.append(image);
+    return;
+  }
+
+  container.innerHTML = iconForEntry(entry);
+}
+
+function entrySubtitle(entry) {
+  if (entry.entryType === "bookmark") {
+    return "Bookmark";
+  }
+
+  if (entry.entryType === "openTab") {
+    return `${entry.label} • Window ${entry.windowId}`;
+  }
+
+  if (entry.slot) {
+    return `Slot ${entry.slot} • ${entry.launchMode === "popupWindow" ? "Floating window" : "Pinned tab"}`;
+  }
+
+  return `Launcher • ${entry.launchMode === "popupWindow" ? "Floating window" : "Regular tab"}`;
+}
+
+function iconForEntry(entry) {
+  if (entry.entryType === "bookmark") {
+    return `<svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4Z"></path></svg>`;
+  }
+
+  if (entry.entryType === "openTab") {
+    return `<svg viewBox="0 0 24 24"><path d="M4 5h16v12H4Z"></path><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>`;
+  }
+
+  if (entry.launchMode === "popupWindow") {
+    return `<svg viewBox="0 0 24 24"><path d="M4 5h16v14H4Z"></path><path d="M9 9h6"></path><path d="M9 13h4"></path></svg>`;
+  }
+
+  if (entry.slot) {
+    return `<svg viewBox="0 0 24 24"><path d="M5 7h14"></path><path d="M5 12h14"></path><path d="M5 17h14"></path></svg>`;
+  }
+
+  return `<svg viewBox="0 0 24 24"><path d="M5 12h11"></path><path d="m12 8 4 4-4 4"></path><path d="M19 5v14"></path></svg>`;
+}
+
+function faviconForConfiguredEntry(entry, tabs) {
+  const matches = tabs
+    .filter((tab) => tab.favIconUrl && tab.url && matchesConfiguredTab(entry, tab))
+    .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+
+  return matches[0]?.favIconUrl || "";
+}
+
+function matchesConfiguredTab(entry, tab) {
+  try {
+    const url = new URL(tab.url);
+    const hosts = entry.match?.hosts || [];
+    const pathPrefixes = entry.match?.pathPrefixes || ["/"];
+    const hostMatches = hosts.length === 0 || hosts.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`));
+    const pathMatches = pathPrefixes.some((prefix) => prefix === "/" || url.pathname.startsWith(prefix));
+    return hostMatches && pathMatches;
+  } catch {
+    return false;
+  }
 }

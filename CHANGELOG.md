@@ -2,6 +2,14 @@
 
 All notable changes to Keyboard Workspace Manager will be documented in this file.
 
+## 0.10.2 - Interface Polish
+
+### Added
+
+- Options-page slot status and shortcut badges for easier scanning.
+- Command palette result icons, richer result metadata, and a more polished selected-result state.
+- Favicons for configured slot and launcher command palette results when a matching tab or floating window is already open.
+
 ## 0.10.1 - Theme Preferences
 
 ### Added

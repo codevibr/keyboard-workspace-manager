@@ -9,6 +9,8 @@
   --accent: #177e89;
   --accent-soft: #e6f6f6;
   --gold-soft: #fff4d6;
+  --icon-bg: #eaf3f5;
+  --icon-text: #177e89;
   --chip-text: #27565c;
   --mode-text: #6b5200;
   --focus-ring: rgba(23, 126, 137, 0.14);
@@ -27,6 +29,8 @@
   --accent: #31a9b3;
   --accent-soft: #123842;
   --gold-soft: #3b3216;
+  --icon-bg: #102f38;
+  --icon-text: #87d8df;
   --chip-text: #b9ccd1;
   --mode-text: #d8c98a;
   --focus-ring: rgba(49, 169, 179, 0.22);
@@ -138,10 +142,10 @@ button:hover {
 .entry {
   display: grid;
   width: 100%;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0;
-  align-items: center;
-  padding: 10px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 11px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
@@ -158,11 +162,44 @@ button:hover {
 .entry:focus-visible,
 .entry.selected {
   border-color: var(--accent);
-  background: var(--accent-soft);
+  background:
+    linear-gradient(90deg, var(--accent-soft), var(--panel) 78%);
 }
 
 .entry.selected {
-  box-shadow: inset 3px 0 0 var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent), 0 8px 18px rgba(23, 32, 51, 0.08);
+}
+
+.entry-icon {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--icon-bg);
+  color: var(--icon-text);
+}
+
+.entry-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.entry-icon img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.entry-content {
+  min-width: 0;
 }
 
 .entry-title {
@@ -182,13 +219,21 @@ button:hover {
 .entry-name {
   color: var(--entry-title);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 650;
 }
 
 .entry-url {
   margin-top: 2px;
   color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.entry-meta {
+  margin-top: 2px;
+  color: var(--muted);
   font-size: 11px;
+  font-weight: 400;
 }
 
 .entry-tags {
@@ -214,6 +259,26 @@ button:hover {
 }
 
 #emptyState {
+  display: grid;
+  gap: 4px;
   margin-top: 14px;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
   text-align: center;
+}
+
+#emptyState[hidden] {
+  display: none;
+}
+
+#emptyState strong {
+  color: var(--entry-title);
+  font-size: 13px;
+}
+
+#emptyState span {
+  font-size: 12px;
+  line-height: 1.4;
 }

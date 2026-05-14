@@ -22,6 +22,7 @@ const fields = {
 };
 
 let settings = await getSettings();
+let commandShortcuts = await getCommandShortcuts();
 applyTheme(settings);
 render(settings);
 await syncBookmarkPermissionState();
@@ -66,6 +67,7 @@ fields.save.addEventListener("click", async () => {
   settings.launcherEntries = readLauncherEntries();
 
   settings = await saveSettings(settings);
+  commandShortcuts = await getCommandShortcuts();
   applyTheme(settings);
   chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
   showStatus("Saved.");
@@ -238,12 +240,21 @@ function renderSlots(nextSettings) {
 
   for (let slot = 1; slot <= 10; slot += 1) {
     const service = nextSettings.services[`slot${slot}`];
+    const status = slotStatus(service);
+    const shortcut = commandShortcuts.get(`focus-slot-${String(slot).padStart(2, "0")}`) || "Not assigned";
     const row = document.createElement("div");
     row.className = "slot";
+    row.dataset.status = status.key;
     row.innerHTML = `
       <div class="slot-number">
-        <span>Slot</span>
-        <strong>${slot}</strong>
+        <div>
+          <span>Slot</span>
+          <strong>${slot}</strong>
+        </div>
+        <div class="slot-badges">
+          <span class="status-badge ${status.key}">${status.label}</span>
+          <span class="shortcut-badge">${shortcut}</span>
+        </div>
       </div>
       <label class="switch-control slot-enabled" title="Enable slot ${slot}">
         <input id="slot${slot}Enabled" type="checkbox">
@@ -315,6 +326,35 @@ function renderSlots(nextSettings) {
       showStatus(`Slot ${slot} cleared. Save to keep it.`);
     });
   }
+}
+
+async function getCommandShortcuts() {
+  if (!chrome.commands?.getAll) {
+    return new Map();
+  }
+
+  try {
+    const commands = await chrome.commands.getAll();
+    return new Map(commands.map((command) => [command.name, command.shortcut || "Not assigned"]));
+  } catch {
+    return new Map();
+  }
+}
+
+function slotStatus(service) {
+  if (!service?.url) {
+    return { key: "disabled", label: "No URL" };
+  }
+
+  if (!service.enabled) {
+    return { key: "disabled", label: "Disabled" };
+  }
+
+  if (service.launchMode === "popupWindow") {
+    return { key: "floating", label: "Floating" };
+  }
+
+  return { key: "pinned", label: "Pinned" };
 }
 
 function renderLauncherEntries(nextSettings) {
