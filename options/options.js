@@ -1,4 +1,5 @@
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from "../src/config.js";
+import { allLaunchableEntries, normalizeAlias, validateUniqueAliases } from "../src/aliasUtils.js";
 import { getSettings, saveSettings } from "../src/storage.js";
 import { applyTheme, watchSystemTheme } from "../src/theme.js";
 
@@ -11,7 +12,9 @@ const fields = {
   includeBookmarksInCommandPalette: document.querySelector("#includeBookmarksInCommandPalette"),
   slots: document.querySelector("#slots"),
   launcherEntries: document.querySelector("#launcherEntries"),
+  launcherFooter: document.querySelector("#launcherFooter"),
   addLauncherEntry: document.querySelector("#addLauncherEntry"),
+  addLauncherEntryBottom: document.querySelector("#addLauncherEntryBottom"),
   openChromeShortcuts: document.querySelector("#openChromeShortcuts"),
   resetDefaults: document.querySelectorAll(".reset-defaults"),
   save: document.querySelector("#save"),
@@ -41,30 +44,13 @@ fields.save.addEventListener("click", async () => {
     { requestIfNeeded: true }
   );
 
-  for (let slot = 1; slot <= 10; slot += 1) {
-    const service = settings.services[`slot${slot}`];
-    const defaultService = DEFAULT_SETTINGS.services[`slot${slot}`];
-    const name = document.querySelector(`#slot${slot}Name`).value.trim();
-    const url = normalizeUrl(document.querySelector(`#slot${slot}Url`).value.trim());
-    const launchMode = document.querySelector(`#slot${slot}Mode`).value;
-    const enabled = document.querySelector(`#slot${slot}Enabled`).checked && Boolean(url);
-
-    service.enabled = enabled;
-    service.name = name || defaultService.name;
-    service.url = url;
-    service.match = matchFromUrl(service.url);
-    service.launchMode = launchMode;
-    service.pinned = launchMode === "pinnedTab";
-    service.windowPreference = launchMode === "popupWindow" ? "popup" : "current";
-    service.popup = {
-      left: toNumber(document.querySelector(`#slot${slot}Left`).value, defaultPopupFor(slot).left),
-      top: toNumber(document.querySelector(`#slot${slot}Top`).value, defaultPopupFor(slot).top),
-      width: toNumber(document.querySelector(`#slot${slot}Width`).value, defaultPopupFor(slot).width),
-      height: toNumber(document.querySelector(`#slot${slot}Height`).value, defaultPopupFor(slot).height)
-    };
-  }
-
+  readSlotFieldsIntoSettings();
   settings.launcherEntries = readLauncherEntries();
+  const aliasValidation = validateUniqueAliases(allLaunchableEntries(settings));
+  if (!aliasValidation.ok) {
+    showStatus(`Alias "${aliasValidation.alias}" is used more than once.`);
+    return;
+  }
 
   settings = await saveSettings(settings);
   commandShortcuts = await getCommandShortcuts();
@@ -132,6 +118,12 @@ fields.importFile.addEventListener("change", async () => {
 
   try {
     const imported = JSON.parse(await file.text());
+    const aliasValidation = validateUniqueAliases(allLaunchableEntries(imported));
+    if (!aliasValidation.ok) {
+      showStatus(`Import failed. Alias "${aliasValidation.alias}" is used more than once.`);
+      return;
+    }
+
     settings = await saveSettings(imported);
     applyTheme(settings);
     render(settings);
@@ -145,12 +137,15 @@ fields.importFile.addEventListener("change", async () => {
   }
 });
 
-fields.addLauncherEntry.addEventListener("click", () => {
+fields.addLauncherEntry.addEventListener("click", addLauncherEntry);
+fields.addLauncherEntryBottom.addEventListener("click", addLauncherEntry);
+
+function addLauncherEntry() {
   settings.launcherEntries = settings.launcherEntries || [];
   settings.launcherEntries.push(createLauncherEntry());
   render(settings);
   showStatus("Entry added. Save to keep it.");
-});
+}
 
 fields.openChromeShortcuts.addEventListener("click", async () => {
   const shortcutsUrl = "chrome://extensions/shortcuts";
@@ -244,12 +239,25 @@ function renderSlots(nextSettings) {
     const shortcut = commandShortcuts.get(`focus-slot-${String(slot).padStart(2, "0")}`) || "Not assigned";
     const row = document.createElement("div");
     row.className = "slot";
+    row.dataset.slot = String(slot);
     row.dataset.status = status.key;
     row.innerHTML = `
       <div class="slot-number">
-        <div>
-          <span>Slot</span>
-          <strong>${slot}</strong>
+        <div class="slot-heading">
+          <button class="drag-handle" type="button" draggable="true" aria-label="Drag slot ${slot}" title="Drag to reorder">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M9 5h.01"></path>
+              <path d="M15 5h.01"></path>
+              <path d="M9 12h.01"></path>
+              <path d="M15 12h.01"></path>
+              <path d="M9 19h.01"></path>
+              <path d="M15 19h.01"></path>
+            </svg>
+          </button>
+          <div>
+            <span>Slot</span>
+            <strong>${slot}</strong>
+          </div>
         </div>
         <div class="slot-badges">
           <span class="status-badge ${status.key}">${status.label}</span>
@@ -267,11 +275,14 @@ function renderSlots(nextSettings) {
       <label class="slot-url">
         URL
         <input id="slot${slot}Url" type="url">
+        Alias
+        <input id="slot${slot}Alias" class="alias-input" type="text" placeholder="my_workspace">
       </label>
       <label class="slot-mode">
         Mode
         <select id="slot${slot}Mode">
           <option value="pinnedTab">Pinned tab</option>
+          <option value="regularTab">Regular tab</option>
           <option value="popupWindow">Floating window</option>
         </select>
       </label>
@@ -303,6 +314,7 @@ function renderSlots(nextSettings) {
     fields.slots.append(row);
     document.querySelector(`#slot${slot}Enabled`).checked = Boolean(service.enabled && service.url);
     document.querySelector(`#slot${slot}Name`).value = service.name;
+    document.querySelector(`#slot${slot}Alias`).value = service.alias || "";
     document.querySelector(`#slot${slot}Url`).value = service.url;
     document.querySelector(`#slot${slot}Mode`).value = service.launchMode || "pinnedTab";
     document.querySelector(`#slot${slot}Left`).value = service.popup?.left ?? defaultPopupFor(slot).left;
@@ -310,6 +322,32 @@ function renderSlots(nextSettings) {
     document.querySelector(`#slot${slot}Width`).value = service.popup?.width ?? defaultPopupFor(slot).width;
     document.querySelector(`#slot${slot}Height`).value = service.popup?.height ?? defaultPopupFor(slot).height;
     updateWindowFields(slot);
+
+    row.querySelector(".drag-handle").addEventListener("dragstart", (event) => {
+      row.classList.add("is-dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", String(slot));
+    });
+    row.querySelector(".drag-handle").addEventListener("dragend", () => {
+      row.classList.remove("is-dragging");
+      clearSlotDropTargets();
+    });
+    row.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      row.classList.add("is-drop-target");
+      event.dataTransfer.dropEffect = "move";
+    });
+    row.addEventListener("dragleave", () => {
+      row.classList.remove("is-drop-target");
+    });
+    row.addEventListener("drop", (event) => {
+      event.preventDefault();
+      const fromSlot = Number.parseInt(event.dataTransfer.getData("text/plain"), 10);
+      if (Number.isInteger(fromSlot) && fromSlot !== slot) {
+        reorderSlots(fromSlot, slot);
+      }
+      clearSlotDropTargets();
+    });
 
     document.querySelector(`#slot${slot}Mode`).addEventListener("change", () => updateWindowFields(slot));
     document.querySelector(`#slot${slot}Edit`).addEventListener("click", () => {
@@ -320,11 +358,81 @@ function renderSlots(nextSettings) {
     document.querySelector(`#slot${slot}Delete`).addEventListener("click", () => {
       document.querySelector(`#slot${slot}Enabled`).checked = false;
       document.querySelector(`#slot${slot}Name`).value = DEFAULT_SETTINGS.services[`slot${slot}`].name;
+      document.querySelector(`#slot${slot}Alias`).value = "";
       document.querySelector(`#slot${slot}Url`).value = "";
       document.querySelector(`#slot${slot}Mode`).value = "pinnedTab";
       updateWindowFields(slot);
       showStatus(`Slot ${slot} cleared. Save to keep it.`);
     });
+  }
+}
+
+function readSlotFieldsIntoSettings() {
+  for (let slot = 1; slot <= 10; slot += 1) {
+    const service = settings.services[`slot${slot}`];
+    const defaultService = DEFAULT_SETTINGS.services[`slot${slot}`];
+    const name = document.querySelector(`#slot${slot}Name`).value.trim();
+    const alias = normalizeAlias(document.querySelector(`#slot${slot}Alias`).value);
+    const url = normalizeUrl(document.querySelector(`#slot${slot}Url`).value.trim());
+    const launchMode = document.querySelector(`#slot${slot}Mode`).value;
+    const enabled = document.querySelector(`#slot${slot}Enabled`).checked && Boolean(url);
+
+    service.enabled = enabled;
+    service.name = name || defaultService.name;
+    service.alias = alias;
+    service.url = url;
+    service.match = matchFromUrl(service.url);
+    service.launchMode = launchMode;
+    service.pinned = launchMode === "pinnedTab";
+    service.windowPreference = launchMode === "popupWindow" ? "popup" : "current";
+    service.popup = {
+      left: toNumber(document.querySelector(`#slot${slot}Left`).value, defaultPopupFor(slot).left),
+      top: toNumber(document.querySelector(`#slot${slot}Top`).value, defaultPopupFor(slot).top),
+      width: toNumber(document.querySelector(`#slot${slot}Width`).value, defaultPopupFor(slot).width),
+      height: toNumber(document.querySelector(`#slot${slot}Height`).value, defaultPopupFor(slot).height)
+    };
+  }
+}
+
+async function reorderSlots(fromSlot, toSlot) {
+  readSlotFieldsIntoSettings();
+  settings.launcherEntries = readLauncherEntries();
+
+  const payloads = Array.from({ length: 10 }, (_, index) => slotPayload(settings.services[`slot${index + 1}`]));
+  const [moved] = payloads.splice(fromSlot - 1, 1);
+  payloads.splice(toSlot - 1, 0, moved);
+
+  for (const [index, payload] of payloads.entries()) {
+    applySlotPayload(settings.services[`slot${index + 1}`], payload);
+  }
+
+  settings = await saveSettings(settings);
+  chrome.runtime.sendMessage({ type: "workspace-manager:update-settings" });
+  render(settings);
+  showStatus(`Moved slot ${fromSlot} to slot ${toSlot}.`);
+}
+
+function slotPayload(service) {
+  return {
+    enabled: service.enabled,
+    name: service.name,
+    alias: service.alias || "",
+    url: service.url,
+    match: structuredClone(service.match),
+    pinned: service.pinned,
+    launchMode: service.launchMode,
+    windowPreference: service.windowPreference,
+    popup: structuredClone(service.popup)
+  };
+}
+
+function applySlotPayload(service, payload) {
+  Object.assign(service, payload);
+}
+
+function clearSlotDropTargets() {
+  for (const row of fields.slots.querySelectorAll(".slot")) {
+    row.classList.remove("is-drop-target");
   }
 }
 
@@ -354,11 +462,16 @@ function slotStatus(service) {
     return { key: "floating", label: "Floating" };
   }
 
+  if (service.launchMode === "regularTab") {
+    return { key: "regular", label: "Regular" };
+  }
+
   return { key: "pinned", label: "Pinned" };
 }
 
 function renderLauncherEntries(nextSettings) {
   fields.launcherEntries.textContent = "";
+  fields.launcherFooter.hidden = (nextSettings.launcherEntries || []).length <= 4;
 
   for (const entry of nextSettings.launcherEntries || []) {
     const row = document.createElement("div");
@@ -376,6 +489,10 @@ function renderLauncherEntries(nextSettings) {
       <label class="launcher-url">
         URL
         <input id="${entry.id}Url" data-entry-field="url" type="url">
+      </label>
+      <label class="launcher-alias">
+        Alias
+        <input id="${entry.id}Alias" data-entry-field="alias" type="text" placeholder="my_workspace">
       </label>
       <label class="launcher-tags">
         Tags
@@ -408,6 +525,7 @@ function renderLauncherEntries(nextSettings) {
     fields.launcherEntries.append(row);
     row.querySelector(`[data-entry-field="enabled"]`).checked = Boolean(entry.enabled && entry.url);
     row.querySelector(`[data-entry-field="name"]`).value = entry.name || "";
+    row.querySelector(`[data-entry-field="alias"]`).value = entry.alias || "";
     row.querySelector(`[data-entry-field="url"]`).value = entry.url || "";
     row.querySelector(`[data-entry-field="tags"]`).value = (entry.tags || []).join(", ");
     row.querySelector(`[data-entry-field="launchMode"]`).value = entry.launchMode || "pinnedTab";
@@ -436,6 +554,7 @@ function readLauncherEntries() {
       id,
       enabled: row.querySelector(`[data-entry-field="enabled"]`).checked && Boolean(url),
       name: row.querySelector(`[data-entry-field="name"]`).value.trim() || "Untitled",
+      alias: normalizeAlias(row.querySelector(`[data-entry-field="alias"]`).value),
       url,
       match: matchFromUrl(url),
       launchMode,
@@ -461,6 +580,7 @@ function createLauncherEntry() {
     id: `launcher-${Date.now().toString(36)}`,
     enabled: false,
     name: "New Entry",
+    alias: "",
     url: "",
     match: {
       hosts: [],

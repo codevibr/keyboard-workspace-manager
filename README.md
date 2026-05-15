@@ -10,10 +10,11 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 - `Ctrl+Shift+4`: focus or create ChatGPT as a pinned tab.
 - Shortcuts 5-10: assign shortcuts manually in Chrome's extension shortcuts page.
 - Toolbar command palette: search and launch unlimited extra workspace entries without adding more slot shortcuts.
+- Web-search fallback from the final command palette result.
 - Optional bookmark search in the command palette, disabled by default.
 - Light, dark, or system-following theme for the options page and command palette.
 
-When a service tab already exists, the extension focuses its window, activates the tab, pins it, and moves it to the configured pinned index. When no matching tab exists, it creates one and applies the same rules.
+When a service tab already exists, the extension focuses its window and activates the tab. Depending on the slot mode, it can keep the tab pinned and ordered, leave it as a regular tab, or focus a matching floating window. When no matching tab exists, it creates one using the same mode.
 
 ## Screenshots
 
@@ -56,9 +57,10 @@ Open the extension options page from `chrome://extensions`. You can choose light
 Each numbered shortcut slot has:
 
 - Name shown in extension logs and options.
+- Optional unique alias for external launch URLs.
 - URL opened when the tab does not already exist.
 - Automatic host/path matching derived from the URL.
-- Launch mode: pinned tab or floating window.
+- Launch mode: pinned tab, regular tab, or floating window.
 - Optional floating-window size and position.
 
 Blank URLs are treated as disabled slots. Disabled slots do nothing when their command is pressed.
@@ -68,6 +70,8 @@ Pinned tab ordering is compressed across enabled pinned-tab slots only. For exam
 Chrome does not let extensions change command names dynamically in `chrome://extensions/shortcuts`, so that page shows generic names such as `Focus Shortcut 1`. The extension options page is the source of truth for your real slot names, such as `Gmail`, `Linear`, `Notion`, or `Banking`. The manifest command ids are `focus-slot-01` through `focus-slot-10` so Chrome sorts them in slot order.
 
 Configuring a slot in the options page does not automatically create its Chrome keyboard shortcut. Chrome keeps shortcut assignment in `chrome://extensions/shortcuts`, so use the options page to define what each slot opens and Chrome's shortcuts page to define which key triggers it.
+
+Drag a slot row onto another slot row to reorder workspace configurations. The Chrome shortcut commands stay fixed as slots 1-10; drag-and-drop moves the configured website, mode, and window settings to the new slot and shifts the slots between them.
 
 The options page includes a `Chrome shortcuts` button. Chrome may block direct navigation to internal `chrome://` pages from extension pages; when that happens, the extension copies `chrome://extensions/shortcuts` so you can paste it into the address bar.
 
@@ -79,7 +83,34 @@ Keyboard slots are fixed because Chrome extension commands must be declared ahea
 
 Launcher Entries are unlimited, configurable workspaces available from the extension toolbar command palette. They can open as regular tabs or floating popup windows, and they are searchable by name, URL, and tags. They do not need Chrome keyboard shortcut assignments.
 
-In the toolbar popup, Launcher Entries and Keyboard Slots appear in one result list, with Launcher Entries ranked first. Type to filter entries and press Enter to launch the highlighted match. Open Chrome tabs also appear when they match the typed title or URL text. If bookmark search is enabled in Settings, matching bookmarks appear after open tabs and open in a new tab.
+In the toolbar popup, Launcher Entries and Keyboard Slots appear in one result list, with Launcher Entries ranked first. Type to filter entries and press Enter to launch the highlighted match. Open Chrome tabs also appear when they match the typed title or URL text. If bookmark search is enabled in Settings, matching bookmarks appear after open tabs and open in a new tab. When you type a query, the final result searches the web using Chrome's default search engine.
+
+## External Alias Launching
+
+Slots and Launcher Entries can have an optional unique alias such as `my_workspace`, `gmail`, or `homelab`. Aliases are case-insensitive and must be unique across all slots and launcher entries.
+
+Chrome extensions cannot register custom `chrome://` URLs, but they can expose extension pages. To launch an alias directly from Deckboard, Logitech Options+, AutoHotkey, or another local automation tool, open:
+
+```text
+chrome-extension://EXTENSION_ID/launch/launch.html?alias=my_workspace
+```
+
+Find `EXTENSION_ID` on `chrome://extensions` with Developer mode enabled. The ID is stable for a Chrome Web Store install. For unpacked development installs, Chrome usually keeps the ID stable for the same extension path, but reinstalling from a different path may change it.
+
+The shorter query key also works:
+
+```text
+chrome-extension://EXTENSION_ID/launch/launch.html?a=my_workspace
+```
+
+The launch page resolves the alias locally, asks the extension service worker to focus or create the matching workspace, then closes its own temporary tab. Launch URLs can also include temporary overrides. Invalid values and unknown parameters are ignored.
+
+- `mode` or `m`: `default`, `tab`, `pinned`, `popup`, or `window`.
+- `new` or `n`: `true` or `false`.
+- `left` or `x`: popup/window left position in pixels.
+- `top` or `y`: popup/window top position in pixels.
+- `width` or `w`: popup/window width in pixels.
+- `height` or `h`: popup/window height in pixels.
 
 For deeper changes, edit `src/config.js`. Each service rule supports:
 
@@ -90,6 +121,7 @@ For deeper changes, edit `src/config.js`. Each service rule supports:
 - `match.pathPrefixes`
 - `pinnedIndex`
 - `pinned`
+- `alias`
 - `windowPreference`
 - optional `popup`
 
@@ -98,9 +130,10 @@ For deeper changes, edit `src/config.js`. Each service rule supports:
 - `tabs`: required to search, activate, pin, and move tabs.
 - `windows`: required to focus Chrome windows and create popup windows.
 - `storage`: required for the options page and future custom settings.
+- `search`: required for the command palette's final web-search fallback, which uses Chrome's default search engine.
 - Optional `bookmarks`: requested only if you enable bookmark search in Settings. It is used locally to search bookmark titles and URLs from the command palette.
 
-The extension does not request website host permissions, inject content scripts, or read/change page contents. It reads tab URLs locally only so it can match a configured shortcut to an already-open tab. If optional bookmark search is enabled, bookmark titles and URLs are searched locally and are not transmitted. Disabling bookmark search removes active bookmark access. Chrome may remember that you previously approved the optional permission, so re-enabling bookmark search may not show the permission prompt again.
+The extension does not request website host permissions, inject content scripts, or read/change page contents. It reads tab URLs locally only so it can match a configured shortcut to an already-open tab. If optional bookmark search is enabled, bookmark titles and URLs are searched locally and are not transmitted. If the web-search fallback is selected, the typed query is passed to Chrome's built-in search API so Chrome can use your default search engine. Disabling bookmark search removes active bookmark access. Chrome may remember that you previously approved the optional permission, so re-enabling bookmark search may not show the permission prompt again.
 
 The extension does not send data anywhere.
 

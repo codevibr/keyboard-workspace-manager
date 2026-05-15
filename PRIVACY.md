@@ -15,12 +15,14 @@ The extension does not use analytics, advertising SDKs, remote servers, tracking
 The extension stores your configuration using Chrome extension storage. This may include:
 
 - Shortcut slot names.
+- Optional shortcut and launcher aliases.
 - Shortcut slot URLs.
 - Whether a slot is enabled.
-- Whether a slot opens as a pinned tab or floating window.
+- Whether a slot opens as a pinned tab, regular tab, or floating window.
 - Window size and position preferences.
 - Debug logging preference.
 - Whether optional bookmark search is enabled.
+- Theme preference and command palette behavior settings.
 
 If Chrome Sync is enabled for extensions, Chrome may sync this configuration through your Google account according to Chrome's own sync settings. Keyboard Workspace Manager does not receive or operate any sync server.
 
@@ -38,6 +40,10 @@ The extension uses Chrome APIs to inspect open tab URLs and window information l
 
 This information is processed locally inside Chrome and is not transmitted.
 
+## External Alias Launch URLs
+
+If you configure an alias, Keyboard Workspace Manager can resolve extension URLs such as `chrome-extension://EXTENSION_ID/launch/launch.html?alias=example_alias`. The alias is matched locally against your saved settings. Aliases are not transmitted by Keyboard Workspace Manager.
+
 ## Optional Bookmark Access
 
 Bookmark search is disabled by default. If you enable bookmark search in Settings, Chrome asks for the optional `bookmarks` permission.
@@ -47,6 +53,10 @@ When enabled, Keyboard Workspace Manager uses Chrome's bookmarks API locally to 
 When bookmark search is disabled, Keyboard Workspace Manager removes active bookmark access. Chrome may remember that you previously approved the optional permission, so re-enabling bookmark search may not show the permission prompt again.
 
 Bookmark titles and URLs are not collected, transmitted, sold, shared, or sent to any remote service by Keyboard Workspace Manager.
+
+## Web Search Fallback
+
+If you select the command palette web-search result, the typed query is passed to Chrome's built-in search API. Chrome then uses your configured default search engine. Keyboard Workspace Manager does not collect, store, or transmit the search query itself.
 
 ## Debug Logging
 

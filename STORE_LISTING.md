@@ -12,18 +12,20 @@ Keyboard shortcuts for configurable pinned tabs and floating browser workspaces.
 
 Keyboard Workspace Manager is built for people who live in Chrome and want their daily browser workspace to respond instantly to muscle memory.
 
-Configure shortcut slots for the web apps, dashboards, inboxes, tools, and assistant windows you use every day. Press a shortcut and the extension finds the existing matching tab, focuses it, pins it, and keeps it in order. If the tab is gone, it creates it again in the right place.
+Configure shortcut slots for the web apps, dashboards, inboxes, tools, and assistant windows you use every day. Press a shortcut and the extension finds the existing matching tab, focuses it, and applies the configured launch mode. Slots can open as pinned tabs, regular tabs, or floating popup windows.
 
 Features:
 
 - Configurable shortcut slots 1-10.
+- Optional unique aliases for launching slots or launcher entries from local automation tools.
 - Focus existing matching tabs across Chrome windows.
 - Create missing tabs automatically.
 - Keep managed tabs pinned and ordered.
-- Open configured shortcuts as floating popup windows.
+- Open configured shortcuts as pinned tabs, regular tabs, or floating popup windows.
 - Ships default shortcuts for slots 1-4; slots 5-10 are enabled by assigning shortcuts in Chrome's Extensions shortcuts page.
 - Toolbar command palette with unlimited searchable launcher entries for workspaces that do not need dedicated keyboard shortcuts.
 - Launcher Entries, Keyboard Slots, and matching open tabs appear in one command palette result list.
+- Search the web from the final command palette result using Chrome's default search engine.
 - Optional bookmark search in the command palette, disabled by default and enabled only after the user grants bookmark permission.
 - Light, dark, or system-following theme for both the options page and command palette.
 - Configure names, URLs, launch mode, and window geometry.
@@ -56,6 +58,8 @@ Chrome manages extension shortcut assignment separately from extension options. 
 
 For additional workspaces beyond the manifest-backed shortcut slots, users can create unlimited Launcher Entries and open them from the extension toolbar popup.
 
+Users can also assign optional aliases to slots or Launcher Entries and launch them through an extension URL. This is useful for local automation tools such as Deckboard, Logitech Options+, and AutoHotkey.
+
 Users on Chrome 127 or newer can assign the `Open Command Palette` extension command to open the toolbar popup from the keyboard. That command should be set to Global because Chrome may not consistently dispatch browser-scoped action-popup shortcuts.
 
 ## Permissions Justification
@@ -74,13 +78,17 @@ Required to focus the Chrome window containing a matched tab and to create or fo
 
 Required to save user configuration, including shortcut names, URLs, enabled state, launch mode, window geometry, debug setting, and import/export state.
 
+### `search`
+
+Required for the command palette's final web-search fallback. The extension passes only the typed query to Chrome's built-in search API, which uses the user's default search engine.
+
 ### Optional `bookmarks`
 
 Requested only if the user enables bookmark search in Settings. Used to search bookmark titles and URLs locally from the command palette and open selected bookmarks in a new tab. Disabling bookmark search removes active bookmark access. Chrome may remember prior approval, so re-enabling the feature may not show the permission prompt again.
 
 ## Privacy Disclosure Draft
 
-This extension does not collect or transmit user data. It does not request website host permissions and does not read or change page contents. It processes tab URLs locally only to match configured shortcuts to existing browser tabs. Optional bookmark search, if enabled by the user, processes bookmark titles and URLs locally for command palette search. Disabling bookmark search removes active bookmark access, though Chrome may remember prior approval for future re-enabling. User settings are stored in Chrome extension storage and may sync through Chrome if the user has Chrome Sync enabled.
+This extension does not collect or transmit user data. It does not request website host permissions and does not read or change page contents. It processes tab URLs locally only to match configured shortcuts to existing browser tabs. Optional aliases are stored locally with the rest of the user's settings and are used only to resolve extension launch URLs. Optional bookmark search, if enabled by the user, processes bookmark titles and URLs locally for command palette search. If the web-search fallback is selected, the typed query is passed to Chrome's built-in search API so Chrome can use the user's default search engine. Disabling bookmark search removes active bookmark access, though Chrome may remember prior approval for future re-enabling. User settings are stored in Chrome extension storage and may sync through Chrome if the user has Chrome Sync enabled.
 
 ## License Disclosure Draft
 

@@ -9,6 +9,14 @@ All notable changes to Keyboard Workspace Manager will be documented in this fil
 - Options-page slot status and shortcut badges for easier scanning.
 - Command palette result icons, richer result metadata, and a more polished selected-result state.
 - Favicons for configured slot and launcher command palette results when a matching tab or floating window is already open.
+- Bottom Add Entry button for Launcher Entries when the list grows beyond four items.
+- Regular tab launch mode for keyboard slots.
+- Drag-and-drop reordering for keyboard slot configurations.
+- More specific URL matching so entries like `docs.google.com/` and `docs.google.com/spreadsheets/` can coexist.
+- Final command palette result for searching the web with Chrome's default search engine.
+- Optional unique aliases for slots and launcher entries.
+- Extension launch URL for opening aliases from Deckboard, Logitech Options+, AutoHotkey, or similar tools.
+- Temporary alias launch URL overrides for mode, new-window behavior, and popup geometry.
 
 ## 0.10.1 - Theme Preferences
 

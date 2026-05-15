@@ -3,14 +3,14 @@ import { findMatchingTabs, chooseBestMatch } from "./tabMatcher.js";
 import { urlForCreate } from "./urlUtils.js";
 import { focusWindow, getCurrentWindowId, popupCreateOptions } from "./windowUtils.js";
 
-export async function focusOrCreateService(service, settings) {
+export async function focusOrCreateService(service, settings, options = {}) {
   if (service.launchMode === "popupWindow" || service.windowPreference === "popup") {
-    return focusOrCreatePopup(service);
+    return focusOrCreatePopup(service, settings, options);
   }
 
   const currentWindowId = await getCurrentWindowId();
-  const matches = await findMatchingTabs(service);
-  const selected = chooseBestMatch(matches, service, currentWindowId);
+  const matches = options.forceNew ? [] : await findMatchingTabs(service, settings);
+  const selected = chooseBestMatch(matches, service, currentWindowId, settings);
 
   if (selected) {
     log("Tab found", describeTab(selected.tab, service));
@@ -22,17 +22,17 @@ export async function focusOrCreateService(service, settings) {
   }
 
   log("No matching tab found; creating", { service: service.name });
-  const created = await createPinnedTab(service, currentWindowId, settings);
+  const created = await createTab(service, currentWindowId, settings);
   if (settings?.healPinnedOrderOnStartup) {
     await healPinnedServices(settings, created.windowId);
   }
   return created;
 }
 
-export async function focusOrCreatePopup(service) {
+export async function focusOrCreatePopup(service, settings, options = {}) {
   const currentWindowId = await getCurrentWindowId();
-  const matches = await findMatchingTabs(service);
-  const selected = chooseBestMatch(matches, service, currentWindowId);
+  const matches = options.forceNew ? [] : await findMatchingTabs(service, settings);
+  const selected = chooseBestMatch(matches, service, currentWindowId, settings);
 
   if (selected && selected.window.type === "popup") {
     log("Popup window found", describeTab(selected.tab, service));
@@ -56,7 +56,7 @@ export async function focusExistingTab(tab, service, settings) {
   }
 }
 
-export async function createPinnedTab(service, windowId, settings) {
+export async function createTab(service, windowId, settings) {
   const createProperties = {
     url: urlForCreate(service),
     active: true,
@@ -84,7 +84,7 @@ export async function healPinnedServices(settings, windowId) {
     .sort((a, b) => a.pinnedIndex - b.pinnedIndex);
 
   for (const [index, service] of services.entries()) {
-    const matches = await findMatchingTabs(service);
+    const matches = await findMatchingTabs(service, settings);
     const match = matches.find((candidate) => candidate.tab.windowId === windowId);
     if (!match) {
       continue;

@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       id: "launcher-linear",
       enabled: false,
       name: "Linear",
+      alias: "",
       url: "",
       match: {
         hosts: [],
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       id: "launcher-notion",
       enabled: false,
       name: "Notion",
+      alias: "",
       url: "",
       match: {
         hosts: [],
@@ -42,6 +44,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       id: "launcher-github",
       enabled: false,
       name: "GitHub",
+      alias: "github",
       url: "https://github.com",
       match: {
         hosts: ["github.com"],
@@ -61,6 +64,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 1,
       enabled: true,
       name: "Gmail",
+      alias: "gmail",
       url: "https://mail.google.com",
       match: {
         hosts: ["mail.google.com"],
@@ -77,6 +81,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 2,
       enabled: true,
       name: "Google Calendar",
+      alias: "calendar",
       url: "https://calendar.google.com",
       match: {
         hosts: ["calendar.google.com"],
@@ -93,6 +98,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 3,
       enabled: true,
       name: "Google Messages",
+      alias: "messages",
       url: "https://messages.google.com/web/conversations",
       match: {
         hosts: ["messages.google.com"],
@@ -109,6 +115,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 4,
       enabled: true,
       name: "ChatGPT",
+      alias: "chatgpt",
       url: "https://chatgpt.com",
       match: {
         hosts: ["chatgpt.com", "www.chatgpt.com"],
@@ -130,6 +137,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 5,
       enabled: false,
       name: "Notify",
+      alias: "",
       url: "",
       match: {
         hosts: [],
@@ -146,6 +154,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 6,
       enabled: false,
       name: "Shortcut 6",
+      alias: "",
       url: "",
       match: {
         hosts: [],
@@ -162,6 +171,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 7,
       enabled: false,
       name: "Shortcut 7",
+      alias: "",
       url: "",
       match: {
         hosts: [],
@@ -178,6 +188,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 8,
       enabled: false,
       name: "Shortcut 8",
+      alias: "",
       url: "",
       match: {
         hosts: [],
@@ -194,6 +205,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 9,
       enabled: false,
       name: "Shortcut 9",
+      alias: "",
       url: "",
       match: {
         hosts: [],
@@ -210,6 +222,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
       slot: 10,
       enabled: false,
       name: "Shortcut 10",
+      alias: "",
       url: "",
       match: {
         hosts: [],

@@ -25,6 +25,7 @@ $include = @(
     "src",
     "options",
     "popup",
+    "launch",
     "icons"
 )
 

@@ -1,5 +1,6 @@
 import { getSettings } from "../src/storage.js";
 import { applyTheme, watchSystemTheme } from "../src/theme.js";
+import { serviceMatchScore } from "../src/urlUtils.js";
 
 const fields = {
   openOptions: document.querySelector("#openOptions"),
@@ -61,7 +62,8 @@ async function render() {
     ...launcherEntries(query, tabs),
     ...keyboardEntries(query, tabs),
     ...(await openTabEntries(query, tabs)),
-    ...(await bookmarkEntries(query))
+    ...(await bookmarkEntries(query)),
+    ...searchEntries(query)
   ];
 
   if (version !== renderVersion) {
@@ -83,7 +85,7 @@ function launcherEntries(query, tabs) {
     .map((entry) => ({
       ...entry,
       entryType: "configured",
-      favIconUrl: faviconForConfiguredEntry(entry, tabs),
+      favIconUrl: faviconForConfiguredEntry(entry, tabs, configuredEntries()),
       label: "Launcher",
       tags: ["launcher", ...(entry.tags || [])]
     }))
@@ -97,7 +99,7 @@ function keyboardEntries(query, tabs) {
     .map((service) => ({
       ...service,
       entryType: "configured",
-      favIconUrl: faviconForConfiguredEntry(service, tabs),
+      favIconUrl: faviconForConfiguredEntry(service, tabs, configuredEntries()),
       label: `Slot ${service.slot}`,
       tags: [`slot ${service.slot}`]
     }))
@@ -154,6 +156,22 @@ async function bookmarkEntries(query) {
       label: "Bookmark",
       tags: ["bookmark"]
     }));
+}
+
+function searchEntries(query) {
+  const text = fields.query.value.trim();
+  if (!query || !text) {
+    return [];
+  }
+
+  return [{
+    id: `search-${query}`,
+    entryType: "search",
+    name: `Search the web for "${text}"`,
+    url: text,
+    label: "Search",
+    tags: ["search"]
+  }];
 }
 
 
@@ -227,6 +245,12 @@ async function launchEntry(entry) {
     return;
   }
 
+  if (entry.entryType === "search") {
+    await chrome.search.query({ text: entry.url, disposition: "NEW_TAB" });
+    window.close();
+    return;
+  }
+
   if (entry.entryType === "openTab") {
     await chrome.windows.update(entry.windowId, { focused: true });
     await chrome.tabs.update(entry.tabId, { active: true });
@@ -248,6 +272,7 @@ function matchesQuery(entry, query) {
 
   return [
     entry.name,
+    entry.alias,
     entry.url,
     entry.label,
     ...(entry.tags || [])
@@ -267,6 +292,10 @@ function matchesBookmark(bookmark, query) {
 function modeLabel(entry) {
   if (entry.entryType === "bookmark") {
     return "Bookmark";
+  }
+
+  if (entry.entryType === "search") {
+    return "Search";
   }
 
   if (entry.entryType === "openTab") {
@@ -299,20 +328,28 @@ function entrySubtitle(entry) {
     return "Bookmark";
   }
 
+  if (entry.entryType === "search") {
+    return "Default search engine";
+  }
+
   if (entry.entryType === "openTab") {
     return `${entry.label} • Window ${entry.windowId}`;
   }
 
   if (entry.slot) {
-    return `Slot ${entry.slot} • ${entry.launchMode === "popupWindow" ? "Floating window" : "Pinned tab"}`;
+    return `Slot ${entry.slot} • ${launchModeLabel(entry)}`;
   }
 
-  return `Launcher • ${entry.launchMode === "popupWindow" ? "Floating window" : "Regular tab"}`;
+  return `Launcher • ${launchModeLabel(entry)}`;
 }
 
 function iconForEntry(entry) {
   if (entry.entryType === "bookmark") {
     return `<svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4Z"></path></svg>`;
+  }
+
+  if (entry.entryType === "search") {
+    return `<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>`;
   }
 
   if (entry.entryType === "openTab") {
@@ -330,23 +367,36 @@ function iconForEntry(entry) {
   return `<svg viewBox="0 0 24 24"><path d="M5 12h11"></path><path d="m12 8 4 4-4 4"></path><path d="M19 5v14"></path></svg>`;
 }
 
-function faviconForConfiguredEntry(entry, tabs) {
-  const matches = tabs
-    .filter((tab) => tab.favIconUrl && tab.url && matchesConfiguredTab(entry, tab))
-    .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+function launchModeLabel(entry) {
+  if (entry.launchMode === "popupWindow") {
+    return "Floating window";
+  }
 
-  return matches[0]?.favIconUrl || "";
+  if (entry.launchMode === "pinnedTab") {
+    return entry.slot ? "Pinned tab" : "Regular tab";
+  }
+
+  return "Regular tab";
 }
 
-function matchesConfiguredTab(entry, tab) {
-  try {
-    const url = new URL(tab.url);
-    const hosts = entry.match?.hosts || [];
-    const pathPrefixes = entry.match?.pathPrefixes || ["/"];
-    const hostMatches = hosts.length === 0 || hosts.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`));
-    const pathMatches = pathPrefixes.some((prefix) => prefix === "/" || url.pathname.startsWith(prefix));
-    return hostMatches && pathMatches;
-  } catch {
-    return false;
-  }
+function configuredEntries() {
+  return [
+    ...Object.values(settings.services || {}),
+    ...(settings.launcherEntries || [])
+  ];
+}
+
+function faviconForConfiguredEntry(entry, tabs, competitors) {
+  const matches = tabs
+    .map((tab) => ({ tab, score: tab.favIconUrl ? serviceMatchScore(tab, entry, competitors) : 0 }))
+    .filter((match) => match.score > 0)
+    .sort((a, b) => {
+      if (a.score !== b.score) {
+        return b.score - a.score;
+      }
+
+      return Number(Boolean(b.tab.pinned)) - Number(Boolean(a.tab.pinned));
+    });
+
+  return matches[0]?.tab.favIconUrl || "";
 }

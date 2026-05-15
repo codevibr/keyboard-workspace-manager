@@ -295,7 +295,7 @@ dd {
 .slot-table-header,
 .slot {
   display: grid;
-  grid-template-columns: 104px 48px minmax(120px, 0.75fr) minmax(180px, 1.3fr) 132px minmax(286px, 1.2fr) 64px;
+  grid-template-columns: 104px 48px minmax(120px, 0.75fr) minmax(210px, 1.3fr) 132px minmax(286px, 1.2fr) 64px;
   gap: 7px;
   align-items: center;
 }
@@ -329,10 +329,25 @@ dd {
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
+.slot.is-dragging {
+  opacity: 0.55;
+}
+
+.slot.is-drop-target {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
 .slot-number {
   display: grid;
   gap: 6px;
   color: var(--text);
+}
+
+.slot-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .slot-number span {
@@ -344,6 +359,34 @@ dd {
 
 .slot-number strong {
   font-size: 20px;
+}
+
+.alias-input {
+  font-family: "Cascadia Mono", "Consolas", monospace;
+}
+
+.drag-handle {
+  width: 26px;
+  min-width: 26px;
+  min-height: 26px;
+  padding: 3px;
+  color: var(--muted);
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+  pointer-events: none;
 }
 
 .slot-badges {
@@ -373,6 +416,11 @@ dd {
 .status-badge.floating {
   background: var(--accent-soft);
   color: var(--accent-strong);
+}
+
+.status-badge.regular {
+  background: var(--warning-soft);
+  color: var(--warning-text);
 }
 
 .status-badge.disabled {
@@ -561,12 +609,22 @@ button:hover,
   padding: 0 18px 18px;
 }
 
+.launcher-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 18px 18px;
+}
+
+.launcher-footer[hidden] {
+  display: none;
+}
+
 .launcher-entry {
   display: grid;
   grid-template-columns: 112px minmax(160px, 1fr) minmax(210px, 1.2fr) 150px 88px;
   grid-template-areas:
     "enabled name url mode reset"
-    "tags tags tags window window";
+    "alias tags tags window window";
   gap: 10px;
   align-items: end;
   padding: 12px;
@@ -601,6 +659,10 @@ button:hover,
 
 .launcher-tags {
   grid-area: tags;
+}
+
+.launcher-alias {
+  grid-area: alias;
 }
 
 .launcher-mode {

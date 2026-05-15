@@ -1,4 +1,6 @@
 import { routeCommand } from "./commandRouter.js";
+import { findEntryByAlias } from "./aliasUtils.js";
+import { applyLaunchOverrides } from "./launchOverrides.js";
 import { setDebug, log, warn } from "./logger.js";
 import { getSettings } from "./storage.js";
 import { focusOrCreateService, healPinnedServices } from "./tabManager.js";
@@ -57,6 +59,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       await focusOrCreateService(entry, settings);
       sendResponse({ ok: true });
+    });
+
+    return true;
+  }
+
+  if (message?.type === "workspace-manager:launch-alias") {
+    runSafely(async () => {
+      const settings = await getSettings();
+      setDebug(settings.debug);
+      const entry = findEntryByAlias(settings, message.alias);
+
+      if (!entry?.enabled || !entry.url) {
+        sendResponse({ ok: false, error: "Alias is disabled, missing, or has no URL." });
+        return;
+      }
+
+      await focusOrCreateService(applyLaunchOverrides(entry, message.overrides), settings, {
+        forceNew: Boolean(message.overrides?.forceNew)
+      });
+      sendResponse({ ok: true, entry: { id: entry.id, name: entry.name, alias: entry.alias } });
     });
 
     return true;
