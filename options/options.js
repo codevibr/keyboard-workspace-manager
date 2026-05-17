@@ -243,34 +243,33 @@ function renderSlots(nextSettings) {
     row.dataset.status = status.key;
     row.innerHTML = `
       <div class="slot-number">
-        <div class="slot-heading">
-          <button class="drag-handle" type="button" draggable="true" aria-label="Drag slot ${slot}" title="Drag to reorder">
-            <svg aria-hidden="true" viewBox="0 0 24 24">
-              <path d="M9 5h.01"></path>
-              <path d="M15 5h.01"></path>
-              <path d="M9 12h.01"></path>
-              <path d="M15 12h.01"></path>
-              <path d="M9 19h.01"></path>
-              <path d="M15 19h.01"></path>
-            </svg>
-          </button>
-          <div>
-            <span>Slot</span>
-            <strong>${slot}</strong>
-          </div>
-        </div>
-        <div class="slot-badges">
-          <span class="status-badge ${status.key}">${status.label}</span>
-          <span class="shortcut-badge">${shortcut}</span>
-        </div>
+        <button class="drag-handle" type="button" draggable="true" aria-label="Drag slot ${slot}" title="Drag to reorder">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M9 5h.01"></path>
+            <path d="M15 5h.01"></path>
+            <path d="M9 12h.01"></path>
+            <path d="M15 12h.01"></path>
+            <path d="M9 19h.01"></path>
+            <path d="M15 19h.01"></path>
+          </svg>
+        </button>
       </div>
-      <label class="switch-control slot-enabled" title="Enable slot ${slot}">
-        <input id="slot${slot}Enabled" type="checkbox">
-        <span class="switch-track"></span>
-      </label>
+      <div class="slot-identity">
+        <div class="slot-heading">
+          <span>Slot</span> <strong>${slot}</strong>
+        </div>
+        <label class="switch-control slot-enabled" title="Enable slot ${slot}">
+          <input id="slot${slot}Enabled" type="checkbox">
+          <span class="switch-track"></span>
+        </label>
+      </div>
       <label class="slot-name">
         Name
         <input id="slot${slot}Name" type="text">
+        <span class="slot-badges">
+          <span class="status-badge ${status.key}">${status.label}</span>
+          <span class="shortcut-badge">${shortcut}</span>
+        </span>
       </label>
       <label class="slot-url">
         URL
@@ -285,6 +284,7 @@ function renderSlots(nextSettings) {
           <option value="regularTab">Regular tab</option>
           <option value="popupWindow">Floating window</option>
         </select>
+        <span class="slot-mode-spacer" aria-hidden="true"></span>
       </label>
       <div id="slot${slot}Window" class="slot-window">
         <label>Left <input id="slot${slot}Left" type="number"></label>

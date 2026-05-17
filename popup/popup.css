@@ -14,7 +14,6 @@
   --chip-text: #27565c;
   --mode-text: #6b5200;
   --focus-ring: rgba(23, 126, 137, 0.14);
-  --selected-line: rgba(23, 126, 137, 0.45);
   font-family: "Segoe UI", system-ui, sans-serif;
 }
 
@@ -34,7 +33,6 @@
   --chip-text: #b9ccd1;
   --mode-text: #d8c98a;
   --focus-ring: rgba(49, 169, 179, 0.22);
-  --selected-line: rgba(49, 169, 179, 0.55);
 }
 
 * {
@@ -74,7 +72,7 @@ h2 {
   margin: 14px 0 8px;
   color: var(--muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -95,7 +93,7 @@ button {
   color: var(--text);
   cursor: pointer;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 650;
 }
 
 button:hover {
@@ -113,7 +111,7 @@ button:hover {
   gap: 6px;
   color: var(--muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -151,11 +149,6 @@ button:hover {
   background: var(--panel);
   color: var(--text);
   text-align: left;
-}
-
-.entry:first-child {
-  border-color: var(--selected-line);
-  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .entry:hover,
@@ -246,11 +239,11 @@ button:hover {
 .tag,
 .mode {
   border-radius: 999px;
-  padding: 2px 6px;
+  padding: 3px 8px;
   background: var(--accent-soft);
   color: var(--chip-text);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .mode {

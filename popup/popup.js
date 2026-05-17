@@ -40,6 +40,11 @@ fields.query.addEventListener("keydown", async (event) => {
 
   if (event.key === "ArrowUp") {
     event.preventDefault();
+    if (selectedIndex <= 0) {
+      focusSearchFieldAtTop();
+      return;
+    }
+
     selectedIndex = Math.max(selectedIndex - 1, 0);
     updateSelectedEntry();
     return;
@@ -47,12 +52,31 @@ fields.query.addEventListener("keydown", async (event) => {
 
   if (event.key === "Enter") {
     event.preventDefault();
+    if (selectedIndex < 0) {
+      return;
+    }
+
     await launchEntry(visibleEntries[selectedIndex]);
   }
 });
 
 render();
 fields.query.focus();
+
+function focusSearchFieldAtTop() {
+  selectedIndex = -1;
+  updateSelectedEntry();
+
+  const scrollRoot = document.scrollingElement || document.documentElement || document.body;
+  scrollRoot.scrollTop = 0;
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  fields.query.focus();
+
+  requestAnimationFrame(() => {
+    scrollRoot.scrollTop = 0;
+    window.scrollTo(0, 0);
+  });
+}
 
 async function render() {
   const version = ++renderVersion;

@@ -179,7 +179,7 @@ body {
   gap: 7px;
   color: #7dd3d8;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 650;
   text-decoration: none;
 }
 
@@ -203,7 +203,7 @@ body {
 
 .help-card dt {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -228,7 +228,7 @@ body {
   margin: 0;
   color: var(--accent-strong);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -295,9 +295,9 @@ dd {
 .slot-table-header,
 .slot {
   display: grid;
-  grid-template-columns: 104px 48px minmax(120px, 0.75fr) minmax(210px, 1.3fr) 132px minmax(286px, 1.2fr) 64px;
-  gap: 7px;
-  align-items: center;
+  grid-template-columns: 24px 96px minmax(150px, 0.85fr) minmax(220px, 1.2fr) 138px minmax(276px, 1fr) 78px;
+  gap: 9px;
+  align-items: start;
 }
 
 .slot-table-header {
@@ -306,7 +306,7 @@ dd {
   background: var(--panel-soft);
   color: var(--muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -339,26 +339,41 @@ dd {
 }
 
 .slot-number {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.slot-identity {
   display: grid;
-  gap: 6px;
+  grid-template-rows: auto 24px;
+  gap: 10px;
+  align-items: start;
   color: var(--text);
 }
 
 .slot-heading {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  align-items: baseline;
+  gap: 4px;
+  min-height: 18px;
 }
 
 .slot-number span {
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
 .slot-number strong {
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.slot-identity .slot-enabled {
+  align-items: start;
+  justify-content: start;
 }
 
 .alias-input {
@@ -366,10 +381,12 @@ dd {
 }
 
 .drag-handle {
-  width: 26px;
-  min-width: 26px;
-  min-height: 26px;
-  padding: 3px;
+  width: 22px;
+  min-width: 22px;
+  height: 120px;
+  min-height: 120px;
+  align-self: stretch;
+  padding: 3px 1px;
   color: var(--muted);
   cursor: grab;
 }
@@ -379,8 +396,8 @@ dd {
 }
 
 .drag-handle svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 62px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -395,12 +412,26 @@ dd {
   gap: 4px;
 }
 
+.slot-name,
+.slot-url,
+.slot-mode {
+  grid-template-rows: auto 38px auto;
+}
+
+.slot-window {
+  align-self: start;
+}
+
+.slot-mode-spacer {
+  min-height: 38px;
+}
+
 .status-badge,
 .shortcut-badge {
   max-width: 100%;
   overflow: hidden;
   border-radius: 999px;
-  padding: 2px 6px;
+  padding: 3px 8px;
   font-size: 10px;
   font-weight: 600;
   line-height: 1.35;
@@ -439,7 +470,7 @@ label {
   gap: 5px;
   color: var(--muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
 }
 
 input,
@@ -482,7 +513,7 @@ button,
   color: var(--text);
   cursor: pointer;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 650;
   text-decoration: none;
 }
 
@@ -548,7 +579,7 @@ button:hover,
 
 .slot-window input,
 .launcher-window input {
-  min-height: 34px;
+  min-height: 38px;
   padding: 7px 6px;
   font-size: 12px;
 }
@@ -564,23 +595,25 @@ button:hover,
 .slot-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-self: start;
   justify-content: end;
   gap: 4px;
+  margin-top: 18px;
 }
 
 .slot-actions button {
-  min-height: 28px;
+  min-height: 38px;
 }
 
 .icon-button {
-  width: 28px;
-  min-width: 28px;
-  padding: 4px;
+  width: 38px;
+  min-width: 38px;
+  padding: 8px;
 }
 
 .icon-button svg {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -755,7 +788,7 @@ dl {
 
 dt {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 650;
 }
 
 dd {
@@ -810,10 +843,10 @@ dd {
   }
 
   .slot {
-    grid-template-columns: 104px 48px minmax(150px, 1fr) minmax(220px, 1.4fr);
+    grid-template-columns: 24px 96px minmax(150px, 1fr) minmax(220px, 1.4fr);
     grid-template-areas:
-      "number enabled name url"
-      ". . mode actions"
+      "number identity name url"
+      ". identity mode actions"
       "window window window window";
   }
 
@@ -821,8 +854,8 @@ dd {
     grid-area: number;
   }
 
-  .slot-enabled {
-    grid-area: enabled;
+  .slot-identity {
+    grid-area: identity;
   }
 
   .slot-name {
@@ -839,6 +872,10 @@ dd {
 
   .slot-window {
     grid-area: window;
+  }
+
+  .slot-enabled {
+    justify-content: start;
   }
 
   .slot-actions {
