@@ -6,6 +6,7 @@ All notable changes to Keyboard Workspace Manager will be documented in this fil
 
 ### Added
 
+- Chrome Graphite, Catppuccin, GitHub, Nord, and Tokyo Night appearance themes for the options page and command palette.
 - Options-page slot status and shortcut badges for easier scanning.
 - Command palette result icons, richer result metadata, and a more polished selected-result state.
 - Favicons for configured slot and launcher command palette results when a matching tab or floating window is already open.
@@ -17,6 +18,16 @@ All notable changes to Keyboard Workspace Manager will be documented in this fil
 - Optional unique aliases for slots and launcher entries.
 - Extension launch URL for opening aliases from Deckboard, Logitech Options+, AutoHotkey, or similar tools.
 - Temporary alias launch URL overrides for mode, new-window behavior, and popup geometry.
+
+### Changed
+
+- Refined command palette typography so result titles, metadata, URLs, and labels are easier to scan in dark themes.
+- Simplified command palette result pills by removing redundant slot, bookmark, and search badges.
+- Differentiated slot result pills as `Pinned`, `Tab`, or `Window`.
+- Reformatted the web-search fallback result to show a stable `Search The Web` title, `Default search engine` metadata, and the typed query on its own line.
+- Improved command palette keyboard navigation so Arrow Up from the first result returns focus to the search field and scrolls the popup back to the top.
+- Tuned hover and selected-result behavior so keyboard selection and mouse hover do not create confusing double-highlight states.
+- Polished options-page slot row alignment, drag handles, edit/delete button sizing, pill padding, and explanatory text weight.
 
 ## 0.10.1 - Theme Preferences
 

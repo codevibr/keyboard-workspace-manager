@@ -27,7 +27,7 @@ Features:
 - Launcher Entries, Keyboard Slots, and matching open tabs appear in one command palette result list.
 - Search the web from the final command palette result using Chrome's default search engine.
 - Optional bookmark search in the command palette, disabled by default and enabled only after the user grants bookmark permission.
-- Light, dark, or system-following theme for both the options page and command palette.
+- Light, dark, system-following, Chrome Graphite, Catppuccin, GitHub, Nord, or Tokyo Night themes for both the options page and command palette.
 - Configure names, URLs, launch mode, and window geometry.
 - Export and import settings as JSON.
 - Reset individual slots or restore defaults.

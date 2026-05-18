@@ -125,7 +125,7 @@ function keyboardEntries(query, tabs) {
       entryType: "configured",
       favIconUrl: faviconForConfiguredEntry(service, tabs, configuredEntries()),
       label: `Slot ${service.slot}`,
-      tags: [`slot ${service.slot}`]
+      tags: []
     }))
     .filter((entry) => matchesQuery(entry, query));
 }
@@ -191,10 +191,12 @@ function searchEntries(query) {
   return [{
     id: `search-${query}`,
     entryType: "search",
-    name: `Search the web for "${text}"`,
+    name: "Search The Web",
     url: text,
+    searchText: text,
+    displayUrl: `"${text}"`,
     label: "Search",
-    tags: ["search"]
+    tags: []
   }];
 }
 
@@ -222,9 +224,12 @@ function renderEntries(container, entries) {
 
     renderEntryIcon(row.querySelector(".entry-icon"), entry);
     row.querySelector(".entry-name").textContent = entry.name || "Untitled";
-    row.querySelector(".mode").textContent = modeLabel(entry);
+    const titleMode = row.querySelector(".mode");
+    const titleModeText = modeLabel(entry);
+    titleMode.textContent = titleModeText;
+    titleMode.hidden = !titleModeText;
     row.querySelector(".entry-meta").textContent = entrySubtitle(entry);
-    row.querySelector(".entry-url").textContent = entry.url;
+    row.querySelector(".entry-url").textContent = entry.displayUrl || entry.url;
 
     const tags = row.querySelector(".entry-tags");
     for (const tag of entry.tags || []) {
@@ -270,7 +275,7 @@ async function launchEntry(entry) {
   }
 
   if (entry.entryType === "search") {
-    await chrome.search.query({ text: entry.url, disposition: "NEW_TAB" });
+    await chrome.search.query({ text: entry.searchText || entry.url, disposition: "NEW_TAB" });
     window.close();
     return;
   }
@@ -315,7 +320,7 @@ function matchesBookmark(bookmark, query) {
 
 function modeLabel(entry) {
   if (entry.entryType === "bookmark") {
-    return "Bookmark";
+    return "";
   }
 
   if (entry.entryType === "search") {
@@ -324,6 +329,14 @@ function modeLabel(entry) {
 
   if (entry.entryType === "openTab") {
     return entry.label;
+  }
+
+  if (entry.slot) {
+    if (entry.launchMode === "popupWindow") {
+      return "Window";
+    }
+
+    return entry.launchMode === "pinnedTab" ? "Pinned" : "Tab";
   }
 
   return entry.launchMode === "popupWindow" ? "Window" : "Tab";

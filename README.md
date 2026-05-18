@@ -12,7 +12,7 @@ A production-oriented Manifest V3 Chrome extension for keyboard-driven pinned-ta
 - Toolbar command palette: search and launch unlimited extra workspace entries without adding more slot shortcuts.
 - Web-search fallback from the final command palette result.
 - Optional bookmark search in the command palette, disabled by default.
-- Light, dark, or system-following theme for the options page and command palette.
+- Light, dark, system-following, Chrome Graphite, Catppuccin, GitHub, Nord, or Tokyo Night themes for the options page and command palette.
 
 When a service tab already exists, the extension focuses its window and activates the tab. Depending on the slot mode, it can keep the tab pinned and ordered, leave it as a regular tab, or focus a matching floating window. When no matching tab exists, it creates one using the same mode.
 
@@ -52,7 +52,7 @@ Chrome may also refuse a shortcut if another extension, Windows, the browser, Lo
 
 ## Configuration
 
-Open the extension options page from `chrome://extensions`. You can choose light mode, dark mode, or follow your Windows theme, toggle debug logging, adjust pinned order healing, optionally enable bookmark search, configure shortcut slots 1-10, and tune any slot that opens as a floating window.
+Open the extension options page from `chrome://extensions`. You can choose light mode, dark mode, follow your Windows theme, or pick from Chrome Graphite, Catppuccin, GitHub, Nord, and Tokyo Night theme variants. You can also toggle debug logging, adjust pinned order healing, optionally enable bookmark search, configure shortcut slots 1-10, and tune any slot that opens as a floating window.
 
 Each numbered shortcut slot has:
 
